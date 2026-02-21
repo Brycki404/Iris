@@ -5,7 +5,7 @@ if _G.Iris then
     return _G.Iris
 end
 
-if not _G.BetterLib or not _G.Get then
+if not _G.BetterLib then
     local OldGet = game.HttpGet or game.HttpGetAsync or nil
     assert(OldGet, "No HttpGet function found.")
     -- Load BetterLib first (if it's not already loaded), since every other loaded stuff will depend on it. If BetterLib fails to load, everything else won't work, but at least the error will be more informative.
