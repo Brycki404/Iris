@@ -14,24 +14,27 @@ end
 -- Begin Script:
 
 local IrisMainURL = "https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/"
-local IrisInitURL = IrisMainURL .. "init.lua"
-
-local MustBeLoadedSequentially = {
+local MustBeLoadedManually = {
+    -- Because of dependencies, they must be loaded in a specific order,
+    -- so we load them manually instead of in the loop with the other modules.
+    "init";
     "Signal";
     "UserInputService";
 }
-
 local IrisURLs = {
-    --lib
+    -- lib
     API = IrisMainURL .. "lib/API.lua";
     Internal = IrisMainURL .. "lib/Internal.lua";
     config = IrisMainURL .. "lib/config.lua";
     demoWindow = IrisMainURL .. "lib/demoWindow.lua";
-    widgets = IrisMainURL .. "lib/widgets/init.lua";
+    init = IrisMainURL .. "lib/init.lua";
+
+    -- src/libraries
     Signal = IrisMainURL .. "src/libraries/UserInputService/Signal.lua";
     UserInputService = IrisMainURL .. "src/libraries/UserInputService/init.lua";
 
-    --widgets
+    -- widgets
+    widgets = IrisMainURL .. "lib/widgets/init.lua";
     Button = IrisMainURL .. "lib/widgets/Button.lua";
     Checkbox = IrisMainURL .. "lib/widgets/Checkbox.lua";
     Combo = IrisMainURL .. "lib/widgets/Combo.lua";
@@ -66,20 +69,21 @@ local IrisURLs = {
 -- calls, we will just look up the modules in that table.
 
 local IrisModules = {}
-for moduleName, url in pairs(IrisURLs) do
-    if not table.find(MustBeLoadedSequentially, moduleName) then
-        IrisModules[moduleName] = loadstring(Get(url))()
-    end
-end
 
 IrisModules.Signal = loadstring(Get(IrisURLs.Signal))()
 IrisModules.UserInputService = loadstring(Get(IrisURLs.UserInputService))()
+
+for moduleName, url in pairs(IrisURLs) do
+    if not table.find(MustBeLoadedManually, moduleName) then
+        IrisModules[moduleName] = loadstring(Get(url))()
+    end
+end
 
 _G.IrisModules = IrisModules
 
 -- Finally initialize Iris and cache it in _G.Iris,
 -- so that it can be accessed by other scripts if needed.
 
-local Iris = loadstring(Get(IrisInitURL))().Init()
+local Iris = loadstring(Get(IrisURLs.init))().Init()
 _G.Iris = Iris
 return Iris
