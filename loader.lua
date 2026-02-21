@@ -79,7 +79,11 @@ _G.IrisModules = IrisModules
 
 for moduleName, url in pairs(IrisURLs) do
     if not table.find(MustBeLoadedManually, moduleName) then
-        IrisModules[moduleName] = loadstring(Get(url))()
+        local got = loadstring(Get(url))
+        if not got then
+            error("[Error] Failed to load module: " .. moduleName .. " from URL: " .. url)
+        end
+        IrisModules[moduleName] = got()
     end
 end
 
