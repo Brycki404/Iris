@@ -13,15 +13,15 @@ if not _G.BetterLib or not _G.Get then
 end
 -- Begin Script:
 
-local IrisMainURL = "https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/"
-local MustBeLoadedManually = {
+IrisMainURL = "https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/"
+MustBeLoadedManually = {
     -- Because of dependencies, they must be loaded in a specific order,
     -- so we load them manually instead of in the loop with the other modules.
     "init";
     "Signal";
     "UserInputService";
 }
-local IrisURLs = {
+IrisURLs = {
     -- lib
     API = IrisMainURL .. "lib/API.lua";
     Internal = IrisMainURL .. "lib/Internal.lua";
@@ -68,10 +68,14 @@ local IrisURLs = {
 -- cache them in _G.IrisModules, and then instead of using require
 -- calls, we will just look up the modules in that table.
 
-local IrisModules = {}
+IrisModules = {}
+_G.IrisModules = IrisModules
 
 IrisModules.Signal = loadstring(Get(IrisURLs.Signal))()
+_G.IrisModules = IrisModules
+
 IrisModules.UserInputService = loadstring(Get(IrisURLs.UserInputService))()
+_G.IrisModules = IrisModules
 
 for moduleName, url in pairs(IrisURLs) do
     if not table.find(MustBeLoadedManually, moduleName) then
@@ -84,6 +88,6 @@ _G.IrisModules = IrisModules
 -- Finally initialize Iris and cache it in _G.Iris,
 -- so that it can be accessed by other scripts if needed.
 
-local Iris = loadstring(Get(IrisURLs.init))().Init()
+Iris = loadstring(Get(IrisURLs.init))().Init()
 _G.Iris = Iris
 return Iris
