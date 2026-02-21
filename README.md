@@ -1,5 +1,5 @@
 
-# Iris
+# Iris (a version that you can loadstring)
 
 Iris is an Immediate mode GUI Library for Roblox, Based on [Dear ImGui](https://github.com/ocornut/imgui). It solves the same problems as Dear ImGui: providing a simple and bloat-free UI system, designed for visualisation and debugging. It is fast, portable, and self-contained (no external dependencies).
 
@@ -118,3 +118,4 @@ Inspriation and design: [Omar Cornut](https://www.miracleworld.net/), [Evaera](h
 
 Thanks!
 <meta name="google-site-verification" content="Ito4GceH5YJJXReIhx9JMqN0YEDdKePHaylk8H3-9Oo" />
+
