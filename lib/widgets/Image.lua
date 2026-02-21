@@ -1,6 +1,4 @@
-local Types = require(script.Parent.Parent.Types)
-
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+return function(Iris, widgets)
     local abstractImage = {
         hasState = false,
         hasChildren = false,
@@ -14,19 +12,19 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["SliceCenter"] = 7,
             ["SliceScale"] = 8,
         },
-        Discard = function(thisWidget: Types.Image)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass
+    }
 
     --stylua: ignore
     Iris.WidgetConstructor("Image", widgets.extend(abstractImage, {
             Events = {
-                ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+                ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                     return thisWidget.Instance
                 end),
             },
-            Generate = function(_thisWidget: Types.Image)
+            Generate = function(_thisWidget)
                 local Image = Instance.new("ImageLabel")
                 Image.Name = "Iris_Image"
                 Image.BackgroundTransparency = 1
@@ -38,7 +36,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
                 return Image
             end,
-            Update = function(thisWidget: Types.Image)
+            Update = function(thisWidget)
                 local Image = thisWidget.Instance :: ImageLabel
     
                 Image.Image = thisWidget.arguments.Image or widgets.ICONS.UNKNOWN_TEXTURE
@@ -66,29 +64,29 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                     Image.ResampleMode = thisWidget.arguments.ResampleMode
                 end
             end,
-        } :: Types.WidgetClass)
+        })
     )
 
     --stylua: ignore
     Iris.WidgetConstructor("ImageButton", widgets.extend(abstractImage, {
             Events = {
-                ["clicked"] = widgets.EVENTS.click(function(thisWidget: Types.Widget)
+                ["clicked"] = widgets.EVENTS.click(function(thisWidget)
                     return thisWidget.Instance
                 end),
-                ["rightClicked"] = widgets.EVENTS.rightClick(function(thisWidget: Types.Widget)
+                ["rightClicked"] = widgets.EVENTS.rightClick(function(thisWidget)
                     return thisWidget.Instance
                 end),
-                ["doubleClicked"] = widgets.EVENTS.doubleClick(function(thisWidget: Types.Widget)
+                ["doubleClicked"] = widgets.EVENTS.doubleClick(function(thisWidget)
                     return thisWidget.Instance
                 end),
-                ["ctrlClicked"] = widgets.EVENTS.ctrlClick(function(thisWidget: Types.Widget)
+                ["ctrlClicked"] = widgets.EVENTS.ctrlClick(function(thisWidget)
                     return thisWidget.Instance
                 end),
-                ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+                ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                     return thisWidget.Instance
                 end),
             },
-            Generate = function(_thisWidget: Types.ImageButton)
+            Generate = function(_thisWidget)
                 local Button = Instance.new("ImageButton")
                 Button.Name = "Iris_ImageButton"
                 Button.AutomaticSize = Enum.AutomaticSize.XY
@@ -121,7 +119,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
                 return Button
             end,
-            Update = function(thisWidget: Types.ImageButton)
+            Update = function(thisWidget)
                 local Button = thisWidget.Instance :: TextButton
                 local Image: ImageLabel = Button.ImageLabel
     
@@ -150,6 +148,6 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                     Image.ResampleMode = thisWidget.arguments.ResampleMode
                 end
             end,
-        } :: Types.WidgetClass)
+        })
     )
 end

@@ -1,6 +1,4 @@
-local Types = require(script.Parent.Parent.Types)
-
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+return function(Iris, widgets)
     local abstractButton = {
         hasState = false,
         hasChildren = false,
@@ -9,23 +7,23 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["Size"] = 2,
         },
         Events = {
-            ["clicked"] = widgets.EVENTS.click(function(thisWidget: Types.Widget)
+            ["clicked"] = widgets.EVENTS.click(function(thisWidget)
                 return thisWidget.Instance
             end),
-            ["rightClicked"] = widgets.EVENTS.rightClick(function(thisWidget: Types.Widget)
+            ["rightClicked"] = widgets.EVENTS.rightClick(function(thisWidget)
                 return thisWidget.Instance
             end),
-            ["doubleClicked"] = widgets.EVENTS.doubleClick(function(thisWidget: Types.Widget)
+            ["doubleClicked"] = widgets.EVENTS.doubleClick(function(thisWidget)
                 return thisWidget.Instance
             end),
-            ["ctrlClicked"] = widgets.EVENTS.ctrlClick(function(thisWidget: Types.Widget)
+            ["ctrlClicked"] = widgets.EVENTS.ctrlClick(function(thisWidget)
                 return thisWidget.Instance
             end),
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(_thisWidget: Types.Button)
+        Generate = function(_thisWidget)
             local Button = Instance.new("TextButton")
             Button.AutomaticSize = Enum.AutomaticSize.XY
             Button.Size = UDim2.fromOffset(0, 0)
@@ -49,31 +47,31 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Button
         end,
-        Update = function(thisWidget: Types.Button)
+        Update = function(thisWidget)
             local Button = thisWidget.Instance :: TextButton
             Button.Text = thisWidget.arguments.Text or "Button"
             Button.Size = thisWidget.arguments.Size or UDim2.fromOffset(0, 0)
         end,
-        Discard = function(thisWidget: Types.Button)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass
+    }
     widgets.abstractButton = abstractButton
 
     --stylua: ignore
     Iris.WidgetConstructor("Button", widgets.extend(abstractButton, {
-            Generate = function(thisWidget: Types.Button)
+            Generate = function(thisWidget)
                 local Button = abstractButton.Generate(thisWidget)
                 Button.Name = "Iris_Button"
 
                 return Button
             end,
-        } :: Types.WidgetClass)
+        })
     )
 
     --stylua: ignore
     Iris.WidgetConstructor("SmallButton", widgets.extend(abstractButton, {
-            Generate = function(thisWidget: Types.Button)
+            Generate = function(thisWidget)
                 local SmallButton = abstractButton.Generate(thisWidget)
                 SmallButton.Name = "Iris_SmallButton"
 
@@ -85,6 +83,6 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
                 return SmallButton
             end,
-        } :: Types.WidgetClass)
+        })
     )
 end

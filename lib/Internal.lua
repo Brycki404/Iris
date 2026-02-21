@@ -1,5 +1,3 @@
-local Types = IrisModules.Types
-
 return function(Iris)
     --[=[
         @class Internal

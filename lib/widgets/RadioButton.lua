@@ -1,6 +1,6 @@
-local Types = require(script.Parent.Parent.Types)
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+
+return function(Iris, widgets)
     --stylua: ignore
     Iris.WidgetConstructor("RadioButton", {
         hasState = true,
@@ -11,28 +11,28 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         },
         Events = {
             ["selected"] = {
-                ["Init"] = function(_thisWidget: Types.RadioButton) end,
-                ["Get"] = function(thisWidget: Types.RadioButton)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastSelectedTick == Iris._cycleTick
                 end,
             },
             ["unselected"] = {
-                ["Init"] = function(_thisWidget: Types.RadioButton) end,
-                ["Get"] = function(thisWidget: Types.RadioButton)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastUnselectedTick == Iris._cycleTick
                 end,
             },
             ["active"] = {
-                ["Init"] = function(_thisWidget: Types.RadioButton) end,
-                ["Get"] = function(thisWidget: Types.RadioButton)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.state.index.value == thisWidget.arguments.Index
                 end,
             },
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(thisWidget: Types.RadioButton)
+        Generate = function(thisWidget)
             local RadioButton = Instance.new("TextButton")
             RadioButton.Name = "Iris_RadioButton"
             RadioButton.AutomaticSize = Enum.AutomaticSize.XY
@@ -89,7 +89,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return RadioButton
         end,
-        Update = function(thisWidget: Types.RadioButton)
+        Update = function(thisWidget)
             local RadioButton = thisWidget.Instance :: TextButton
             local TextLabel: TextLabel = RadioButton.TextLabel
 
@@ -99,16 +99,16 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 Iris._widgets[thisWidget.type].UpdateState(thisWidget)
             end
         end,
-        Discard = function(thisWidget: Types.RadioButton)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
             widgets.discardState(thisWidget)
         end,
-        GenerateState = function(thisWidget: Types.RadioButton)
+        GenerateState = function(thisWidget)
             if thisWidget.state.index == nil then
                 thisWidget.state.index = Iris._widgetState(thisWidget, "index", thisWidget.arguments.Index)
             end
         end,
-        UpdateState = function(thisWidget: Types.RadioButton)
+        UpdateState = function(thisWidget)
             local RadioButton = thisWidget.Instance :: TextButton
             local Button = RadioButton.Button :: Frame
             local Circle: Frame = Button.Circle
@@ -122,5 +122,5 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.lastUnselectedTick = Iris._cycleTick + 1
             end
         end,
-    } :: Types.WidgetClass)
+    })
 end

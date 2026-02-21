@@ -15,14 +15,38 @@ end
 
 local IrisMainURL = "https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/"
 local IrisInitURL = IrisMainURL .. "init.lua"
+
+local MustBeLoadedSequentially = {
+    "Signal";
+    "UserInputService";
+}
+
 local IrisURLs = {
+    --lib
     API = IrisMainURL .. "lib/API.lua";
     Internal = IrisMainURL .. "lib/Internal.lua";
-    PubTypes = IrisMainURL .. "lib/PubTypes.lua";
-    Types = IrisMainURL .. "lib/Types.lua";
-    WidgetTypes = IrisMainURL .. "lib/WidgetTypes.lua";
     config = IrisMainURL .. "lib/config.lua";
-    demoWindow = IrisMainURL .. "demoWindow.lua";
+    demoWindow = IrisMainURL .. "lib/demoWindow.lua";
+    widgets = IrisMainURL .. "lib/widgets/init.lua";
+    Signal = IrisMainURL .. "src/libraries/UserInputService/Signal.lua";
+    UserInputService = IrisMainURL .. "src/libraries/UserInputService/init.lua";
+
+    --widgets
+    Button = IrisMainURL .. "lib/widgets/Button.lua";
+    Checkbox = IrisMainURL .. "lib/widgets/Checkbox.lua";
+    Combo = IrisMainURL .. "lib/widgets/Combo.lua";
+    Format = IrisMainURL .. "lib/widgets/Format.lua";
+    Image = IrisMainURL .. "lib/widgets/Image.lua";
+    Input = IrisMainURL .. "lib/widgets/Input.lua";
+    Menu = IrisMainURL .. "lib/widgets/Menu.lua";
+    Plot = IrisMainURL .. "lib/widgets/Plot.lua";
+    RadioButton = IrisMainURL .. "lib/widgets/RadioButton.lua";
+    Root = IrisMainURL .. "lib/widgets/Root.lua";
+    Tab = IrisMainURL .. "lib/widgets/Tab.lua";
+    Table = IrisMainURL .. "lib/widgets/Table.lua";
+    Text = IrisMainURL .. "lib/widgets/Text.lua";
+    Tree = IrisMainURL .. "lib/widgets/Tree.lua";
+    Window = IrisMainURL .. "lib/widgets/Window.lua";
 }
 
 -- Load and cache all of the required modules before initializing Iris
@@ -43,13 +67,19 @@ local IrisURLs = {
 
 local IrisModules = {}
 for moduleName, url in pairs(IrisURLs) do
-    IrisModules[moduleName] = loadstring(Get(url))()
+    if not table.find(MustBeLoadedSequentially, moduleName) then
+        IrisModules[moduleName] = loadstring(Get(url))()
+    end
 end
+
+IrisModules.Signal = loadstring(Get(IrisURLs.Signal))()
+IrisModules.UserInputService = loadstring(Get(IrisURLs.UserInputService))()
+
 _G.IrisModules = IrisModules
 
 -- Finally initialize Iris and cache it in _G.Iris,
 -- so that it can be accessed by other scripts if needed.
 
-local Iris = loadstring(Get(IrisInitURL))()
+local Iris = loadstring(Get(IrisInitURL))().Init()
 _G.Iris = Iris
 return Iris

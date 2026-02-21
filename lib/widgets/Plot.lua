@@ -1,6 +1,6 @@
-local Types = require(script.Parent.Parent.Types)
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+
+return function(Iris, widgets)
     -- stylua: ignore
     Iris.WidgetConstructor("ProgressBar", {
         hasState = true,
@@ -10,17 +10,17 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["Format"] = 2,
         },
         Events = {
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
             ["changed"] = {
-                ["Init"] = function(_thisWidget: Types.ProgressBar) end,
-                ["Get"] = function(thisWidget: Types.ProgressBar)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastChangedTick == Iris._cycleTick
                 end,
             },
         },
-        Generate = function(_thisWidget: Types.ProgressBar)
+        Generate = function(_thisWidget)
             local ProgressBar = Instance.new("Frame")
             ProgressBar.Name = "Iris_ProgressBar"
             ProgressBar.AutomaticSize = Enum.AutomaticSize.Y
@@ -85,12 +85,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return ProgressBar
         end,
-        GenerateState = function(thisWidget: Types.ProgressBar)
+        GenerateState = function(thisWidget)
             if thisWidget.state.progress == nil then
                 thisWidget.state.progress = Iris._widgetState(thisWidget, "Progress", 0)
             end
         end,
-        Update = function(thisWidget: Types.ProgressBar)
+        Update = function(thisWidget)
             local Progress = thisWidget.Instance :: Frame
             local TextLabel: TextLabel = Progress.TextLabel
             local Bar = Progress.Bar :: Frame
@@ -102,7 +102,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             TextLabel.Text = thisWidget.arguments.Text or "Progress Bar"
         end,
-        UpdateState = function(thisWidget: Types.ProgressBar)
+        UpdateState = function(thisWidget)
             local ProgressBar = thisWidget.Instance :: Frame
             local Bar = ProgressBar.Bar :: Frame
             local Progress: TextLabel = Bar.Progress
@@ -127,11 +127,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             end
             thisWidget.lastChangedTick = Iris._cycleTick + 1
         end,
-        Discard = function(thisWidget: Types.ProgressBar)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
             widgets.discardState(thisWidget)
         end,
-    } :: Types.WidgetClass)
+    })
 
     local function createLine(parent: Frame, index: number)
         local Block = Instance.new("Frame")
@@ -146,7 +146,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         return Block
     end
 
-    local function clearLine(thisWidget: Types.PlotLines)
+    local function clearLine(thisWidget)
         if thisWidget.HoveredLine then
             thisWidget.HoveredLine.BackgroundColor3 = Iris._config.PlotLinesColor
             thisWidget.HoveredLine.BackgroundTransparency = Iris._config.PlotLinesTransparency
@@ -155,7 +155,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         end
     end
 
-    local function updateLine(thisWidget: Types.PlotLines, silent: true?)
+    local function updateLine(thisWidget, silent: true?)
         local PlotLines = thisWidget.Instance :: Frame
         local Background = PlotLines.Background :: Frame
         local Plot = Background.Plot :: Frame
@@ -203,11 +203,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["TextOverlay"] = 5,
         },
         Events = {
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(thisWidget: Types.PlotLines)
+        Generate = function(thisWidget)
             local PlotLines = Instance.new("Frame")
             PlotLines.Name = "Iris_PlotLines"
             PlotLines.Size = UDim2.new(Iris._config.ItemWidth, UDim.new())
@@ -300,7 +300,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return PlotLines
         end,
-        GenerateState = function(thisWidget: Types.PlotLines)
+        GenerateState = function(thisWidget)
             if thisWidget.state.values == nil then
                 thisWidget.state.values = Iris._widgetState(thisWidget, "values", { 0, 1 })
             end
@@ -308,7 +308,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.state.hovered = Iris._widgetState(thisWidget, "hovered", nil)
             end
         end,
-        Update = function(thisWidget: Types.PlotLines)
+        Update = function(thisWidget)
             local PlotLines = thisWidget.Instance :: Frame
             local TextLabel: TextLabel = PlotLines.TextLabel
             local Background = PlotLines.Background :: Frame
@@ -319,7 +319,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             OverlayText.Text = thisWidget.arguments.TextOverlay or ""
             PlotLines.Size = UDim2.new(1, 0, 0, thisWidget.arguments.Height or 0)
         end,
-        UpdateState = function(thisWidget: Types.PlotLines)
+        UpdateState = function(thisWidget)
             if thisWidget.state.hovered.lastChangeTick == Iris._cycleTick then
                 if thisWidget.state.hovered.value then
                     thisWidget.Tooltip.Visible = true
@@ -382,12 +382,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end
         end,
-        Discard = function(thisWidget: Types.PlotLines)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
             thisWidget.Tooltip:Destroy()
             widgets.discardState(thisWidget)
         end,
-    } :: Types.WidgetClass)
+    })
 
     local function createBlock(parent: Frame, index: number)
         local Block = Instance.new("Frame")
@@ -401,7 +401,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         return Block
     end
 
-    local function clearBlock(thisWidget: Types.PlotHistogram)
+    local function clearBlock(thisWidget)
         if thisWidget.HoveredBlock then
             thisWidget.HoveredBlock.BackgroundColor3 = Iris._config.PlotHistogramColor
             thisWidget.HoveredBlock.BackgroundTransparency = Iris._config.PlotHistogramTransparency
@@ -410,7 +410,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         end
     end
 
-    local function updateBlock(thisWidget: Types.PlotHistogram, silent: true?)
+    local function updateBlock(thisWidget, silent: true?)
         local PlotHistogram = thisWidget.Instance :: Frame
         local Background = PlotHistogram.Background :: Frame
         local Plot = Background.Plot :: Frame
@@ -454,11 +454,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["BaseLine"] = 6,
         },
         Events = {
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(thisWidget: Types.PlotHistogram)
+        Generate = function(thisWidget)
             local PlotHistogram = Instance.new("Frame")
             PlotHistogram.Name = "Iris_PlotHistogram"
             PlotHistogram.Size = UDim2.new(Iris._config.ItemWidth, UDim.new())
@@ -549,7 +549,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return PlotHistogram
         end,
-        GenerateState = function(thisWidget: Types.PlotHistogram)
+        GenerateState = function(thisWidget)
             if thisWidget.state.values == nil then
                 thisWidget.state.values = Iris._widgetState(thisWidget, "values", { 1 })
             end     
@@ -557,7 +557,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.state.hovered = Iris._widgetState(thisWidget, "hovered", nil)
             end     
         end,
-        Update = function(thisWidget: Types.PlotHistogram)
+        Update = function(thisWidget)
             local PlotLines = thisWidget.Instance :: Frame
             local TextLabel: TextLabel = PlotLines.TextLabel
             local Background = PlotLines.Background :: Frame
@@ -568,7 +568,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             OverlayText.Text = thisWidget.arguments.TextOverlay or ""
             PlotLines.Size = UDim2.new(1, 0, 0, thisWidget.arguments.Height or 0)
         end,
-        UpdateState = function(thisWidget: Types.PlotHistogram)
+        UpdateState = function(thisWidget)
             if thisWidget.state.hovered.lastChangeTick == Iris._cycleTick then
                 if thisWidget.state.hovered.value then
                     thisWidget.Tooltip.Visible = true
@@ -630,10 +630,10 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end
         end,
-        Discard = function(thisWidget: Types.PlotHistogram)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
             thisWidget.Tooltip:Destroy()
             widgets.discardState(thisWidget)            
         end,
-    } :: Types.WidgetClass)
+    })
 end

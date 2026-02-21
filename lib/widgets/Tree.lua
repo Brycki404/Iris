@@ -1,19 +1,19 @@
-local Types = require(script.Parent.Parent.Types)
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+
+return function(Iris, widgets)
     local abstractTree = {
         hasState = true,
         hasChildren = true,
         Events = {
             ["collapsed"] = {
-                ["Init"] = function(_thisWidget: Types.CollapsingHeader) end,
-                ["Get"] = function(thisWidget: Types.CollapsingHeader)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastCollapsedTick == Iris._cycleTick
                 end,
             },
             ["uncollapsed"] = {
-                ["Init"] = function(_thisWidget: Types.CollapsingHeader) end,
-                ["Get"] = function(thisWidget: Types.CollapsingHeader)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastUncollapsedTick == Iris._cycleTick
                 end,
             },
@@ -21,18 +21,18 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 return thisWidget.Instance
             end),
         },
-        Discard = function(thisWidget: Types.CollapsingHeader)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
             widgets.discardState(thisWidget)
         end,
-        ChildAdded = function(thisWidget: Types.CollapsingHeader, _thisChild: Types.Widget)
+        ChildAdded = function(thisWidget, _thisChild)
             local ChildContainer = thisWidget.ChildContainer :: Frame
 
             ChildContainer.Visible = thisWidget.state.isUncollapsed.value
 
             return ChildContainer
         end,
-        UpdateState = function(thisWidget: Types.CollapsingHeader)
+        UpdateState = function(thisWidget)
             local isUncollapsed = thisWidget.state.isUncollapsed.value
             local Tree = thisWidget.Instance :: Frame
             local ChildContainer = thisWidget.ChildContainer :: Frame
@@ -49,12 +49,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             ChildContainer.Visible = isUncollapsed
         end,
-        GenerateState = function(thisWidget: Types.CollapsingHeader)
+        GenerateState = function(thisWidget)
             if thisWidget.state.isUncollapsed == nil then
                 thisWidget.state.isUncollapsed = Iris._widgetState(thisWidget, "isUncollapsed", thisWidget.arguments.DefaultOpen or false)
             end
         end,
-    } :: Types.WidgetClass
+    }
 
     --stylua: ignore
     Iris.WidgetConstructor(
@@ -66,7 +66,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 ["NoIndent"] = 3,
                 ["DefaultOpen"] = 4,
             },
-            Generate = function(thisWidget: Types.Tree)
+            Generate = function(thisWidget)
                 local Tree = Instance.new("Frame")
                 Tree.Name = "Iris_Tree"
                 Tree.AutomaticSize = Enum.AutomaticSize.Y
@@ -150,7 +150,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.ChildContainer = ChildContainer
                 return Tree
             end,
-            Update = function(thisWidget: Types.Tree)
+            Update = function(thisWidget)
                 local Tree = thisWidget.Instance :: Frame
                 local ChildContainer = thisWidget.ChildContainer :: Frame
                 local Header = Tree.Header :: Frame
@@ -184,7 +184,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 ["Text"] = 1,
                 ["DefaultOpen"] = 2
             },
-            Generate = function(thisWidget: Types.CollapsingHeader)
+            Generate = function(thisWidget)
                 local CollapsingHeader = Instance.new("Frame")
                 CollapsingHeader.Name = "Iris_CollapsingHeader"
                 CollapsingHeader.AutomaticSize = Enum.AutomaticSize.Y
@@ -274,7 +274,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.ChildContainer = ChildContainer
                 return CollapsingHeader
             end,
-            Update = function(thisWidget: Types.CollapsingHeader)
+            Update = function(thisWidget)
                 local Tree = thisWidget.Instance :: Frame
                 local Header = Tree.Header :: Frame
                 local Button = Header.Button :: TextButton

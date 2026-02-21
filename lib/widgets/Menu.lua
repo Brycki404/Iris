@@ -1,9 +1,9 @@
-local Types = require(script.Parent.Parent.Types)
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+
+return function(Iris, widgets)
     local AnyMenuOpen = false
-    local ActiveMenu: Types.Menu? = nil
-    local MenuStack: { Types.Menu } = {}
+    local ActiveMenu = nil
+    local MenuStack = {}
 
     local function EmptyMenuStack(menuIndex: number?)
         for index = #MenuStack, menuIndex and menuIndex + 1 or 1, -1 do
@@ -22,7 +22,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         end
     end
 
-    local function UpdateChildContainerTransform(thisWidget: Types.Menu)
+    local function UpdateChildContainerTransform(thisWidget)
         local submenu = thisWidget.parentWidget.type == "Menu"
 
         local Menu = thisWidget.Instance :: Frame
@@ -104,7 +104,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         hasChildren = true,
         Args = {},
         Events = {},
-        Generate = function(_thisWidget: Types.MenuBar)
+        Generate = function(_thisWidget)
             local MenuBar = Instance.new("Frame")
             MenuBar.Name = "Iris_MenuBar"
             MenuBar.AutomaticSize = Enum.AutomaticSize.Y
@@ -120,16 +120,16 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return MenuBar
         end,
-        Update = function(_thisWidget: Types.Widget)
+        Update = function(_thisWidget)
             
         end,
-        ChildAdded = function(thisWidget: Types.MenuBar, _thisChild: Types.Widget)
+        ChildAdded = function(thisWidget, _thisChild)
             return thisWidget.Instance
         end,
-        Discard = function(thisWidget: Types.MenuBar)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 
     --stylua: ignore
     Iris.WidgetConstructor("Menu", {
@@ -139,26 +139,26 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["Text"] = 1,
         },
         Events = {
-            ["clicked"] = widgets.EVENTS.click(function(thisWidget: Types.Widget)
+            ["clicked"] = widgets.EVENTS.click(function(thisWidget)
                 return thisWidget.Instance
             end),
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
             ["opened"] = {
-                ["Init"] = function(_thisWidget: Types.Menu) end,
-                ["Get"] = function(thisWidget: Types.Menu)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastOpenedTick == Iris._cycleTick
                 end,
             },
             ["closed"] = {
-                ["Init"] = function(_thisWidget: Types.Menu) end,
-                ["Get"] = function(thisWidget: Types.Menu)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastClosedTick == Iris._cycleTick
                 end,
             },
         },
-        Generate = function(thisWidget: Types.Menu)
+        Generate = function(thisWidget)
             local Menu: TextButton
             thisWidget.ButtonColors = {
                 Color = Iris._config.HeaderColor,
@@ -244,7 +244,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             widgets.applyMouseEnter(Menu, function()
                 if AnyMenuOpen and ActiveMenu and ActiveMenu ~= thisWidget then
-                    local parentMenu = thisWidget.parentWidget :: Types.Menu
+                    local parentMenu = thisWidget.parentWidget :
                     local parentIndex = table.find(MenuStack, parentMenu)
 
                     EmptyMenuStack(parentIndex)
@@ -294,7 +294,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             thisWidget.ChildContainer = ChildContainer
             return Menu
         end,
-        Update = function(thisWidget: Types.Menu)
+        Update = function(thisWidget)
             local Menu = thisWidget.Instance :: TextButton
             local TextLabel: TextLabel
             if thisWidget.parentWidget.type == "Menu" then
@@ -304,19 +304,19 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             end
             TextLabel.Text = thisWidget.arguments.Text or "Menu"
         end,
-        ChildAdded = function(thisWidget: Types.Menu, _thisChild: Types.Widget)
+        ChildAdded = function(thisWidget, _thisChild)
             UpdateChildContainerTransform(thisWidget)
             return thisWidget.ChildContainer
         end,
-        ChildDiscarded = function(thisWidget: Types.Menu, _thisChild: Types.Widget)
+        ChildDiscarded = function(thisWidget, _thisChild)
             UpdateChildContainerTransform(thisWidget)
         end,
-        GenerateState = function(thisWidget: Types.Menu)
+        GenerateState = function(thisWidget)
             if thisWidget.state.isOpened == nil then
                 thisWidget.state.isOpened = Iris._widgetState(thisWidget, "isOpened", false)
             end
         end,
-        UpdateState = function(thisWidget: Types.Menu)
+        UpdateState = function(thisWidget)
             local ChildContainer = thisWidget.ChildContainer :: ScrollingFrame
 
             if thisWidget.state.isOpened.value then
@@ -331,10 +331,10 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 ChildContainer.Visible = false
             end
         end,
-        Discard = function(thisWidget: Types.Menu)
+        Discard = function(thisWidget)
             -- properly handle removing a menu if open and deleted
             if AnyMenuOpen then
-                local parentMenu = thisWidget.parentWidget :: Types.Menu
+                local parentMenu = thisWidget.parentWidget :
                 local parentIndex = table.find(MenuStack, parentMenu)
                 if parentIndex then
                     EmptyMenuStack(parentIndex)
@@ -349,7 +349,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             thisWidget.ChildContainer:Destroy()
             widgets.discardState(thisWidget)
         end,
-    } :: Types.WidgetClass)
+    })
 
     --stylua: ignore
     Iris.WidgetConstructor("MenuItem", {
@@ -361,14 +361,14 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ModifierKey = 3,
         },
         Events = {
-            ["clicked"] = widgets.EVENTS.click(function(thisWidget: Types.Widget)
+            ["clicked"] = widgets.EVENTS.click(function(thisWidget)
                 return thisWidget.Instance
             end),
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(thisWidget: Types.MenuItem)
+        Generate = function(thisWidget)
             local MenuItem = Instance.new("TextButton")
             MenuItem.Name = "Iris_MenuItem"
             MenuItem.AutomaticSize = Enum.AutomaticSize.Y
@@ -396,7 +396,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             end)
 
             widgets.applyMouseEnter(MenuItem, function()
-                local parentMenu = thisWidget.parentWidget :: Types.Menu
+                local parentMenu = thisWidget.parentWidget :
                 if AnyMenuOpen and ActiveMenu and ActiveMenu ~= parentMenu then
                     local parentIndex = table.find(MenuStack, parentMenu)
 
@@ -433,7 +433,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return MenuItem
         end,
-        Update = function(thisWidget: Types.MenuItem)
+        Update = function(thisWidget)
             local MenuItem = thisWidget.Instance :: TextButton
             local TextLabel: TextLabel = MenuItem.TextLabel
             local Shortcut: TextLabel = MenuItem.Shortcut
@@ -447,10 +447,10 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end
         end,
-        Discard = function(thisWidget: Types.MenuItem)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 
     --stylua: ignore
     Iris.WidgetConstructor("MenuToggle", {
@@ -463,22 +463,22 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         },
         Events = {
             ["checked"] = {
-                ["Init"] = function(_thisWidget: Types.MenuToggle) end,
-                ["Get"] = function(thisWidget: Types.MenuToggle): boolean
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget): boolean
                     return thisWidget.lastCheckedTick == Iris._cycleTick
                 end,
             },
             ["unchecked"] = {
-                ["Init"] = function(_thisWidget: Types.MenuToggle) end,
-                ["Get"] = function(thisWidget: Types.MenuToggle): boolean
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget): boolean
                     return thisWidget.lastUncheckedTick == Iris._cycleTick
                 end,
             },
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(thisWidget: Types.MenuToggle)
+        Generate = function(thisWidget)
             local MenuToggle = Instance.new("TextButton")
             MenuToggle.Name = "Iris_MenuToggle"
             MenuToggle.AutomaticSize = Enum.AutomaticSize.Y
@@ -507,7 +507,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             end)
 
             widgets.applyMouseEnter(MenuToggle, function()
-                local parentMenu = thisWidget.parentWidget :: Types.Menu
+                local parentMenu = thisWidget.parentWidget :
                 if AnyMenuOpen and ActiveMenu and ActiveMenu ~= parentMenu then
                     local parentIndex = table.find(MenuStack, parentMenu)
 
@@ -560,12 +560,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return MenuToggle
         end,
-        GenerateState = function(thisWidget: Types.MenuToggle)
+        GenerateState = function(thisWidget)
             if thisWidget.state.isChecked == nil then
                 thisWidget.state.isChecked = Iris._widgetState(thisWidget, "isChecked", false)
             end
         end,
-        Update = function(thisWidget: Types.MenuToggle)
+        Update = function(thisWidget)
             local MenuToggle = thisWidget.Instance :: TextButton
             local TextLabel: TextLabel = MenuToggle.TextLabel
             local Shortcut: TextLabel = MenuToggle.Shortcut
@@ -579,7 +579,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end
         end,
-        UpdateState = function(thisWidget: Types.MenuToggle)
+        UpdateState = function(thisWidget)
             local MenuItem = thisWidget.Instance :: TextButton
             local Icon: ImageLabel = MenuItem.Icon
 
@@ -591,9 +591,9 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.lastUncheckedTick = Iris._cycleTick + 1
             end
         end,
-        Discard = function(thisWidget: Types.MenuToggle)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
             widgets.discardState(thisWidget)
         end,
-    } :: Types.WidgetClass)
+    })
 end

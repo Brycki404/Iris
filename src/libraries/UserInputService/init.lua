@@ -1,4 +1,4 @@
-local Signal = require(script.Signal)
+local Signal = IrisModules.Signal
 
 local UserInputService: UserInputService = game:GetService("UserInputService")
 

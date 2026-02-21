@@ -1,7 +1,7 @@
-local Types = require(script.Parent.Parent.Types)
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
-    local function openTab(TabBar: Types.TabBar, Index: number)
+
+return function(Iris, widgets)
+    local function openTab(TabBar, Index: number)
         if TabBar.state.index.value > 0 then
             return
         end
@@ -9,7 +9,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         TabBar.state.index:set(Index)
     end
 
-    local function closeTab(TabBar: Types.TabBar, Index: number)
+    local function closeTab(TabBar, Index: number)
         if TabBar.state.index.value ~= Index then
             return
         end
@@ -40,7 +40,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         hasChildren = true,
         Args = {},
         Events = {},
-        Generate = function(thisWidget: Types.TabBar)
+        Generate = function(thisWidget)
             local TabBar = Instance.new("Frame")
             TabBar.Name = "Iris_TabBar"
             TabBar.AutomaticSize = Enum.AutomaticSize.Y
@@ -87,8 +87,8 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return TabBar
         end,
-        Update = function(_thisWidget: Types.TabBar) end,
-        ChildAdded = function(thisWidget: Types.TabBar, thisChild: Types.Tab)
+        Update = function(_thisWidget) end,
+        ChildAdded = function(thisWidget, thisChild)
             assert(thisChild.type == "Tab", "Only Iris.Tab can be parented to Iris.TabBar.")
             local TabBar = thisWidget.Instance :: Frame
             thisChild.ChildContainer.Parent = thisWidget.ChildContainer
@@ -98,7 +98,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return TabBar.Bar
         end,
-        ChildDiscarded = function(thisWidget: Types.TabBar, thisChild: Types.Tab)
+        ChildDiscarded = function(thisWidget, thisChild)
             local Index = thisChild.Index
             table.remove(thisWidget.Tabs, Index)
 
@@ -108,17 +108,17 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             closeTab(thisWidget, Index)
         end,
-        GenerateState = function(thisWidget: Types.Tab)
+        GenerateState = function(thisWidget)
             if thisWidget.state.index == nil then
                 thisWidget.state.index = Iris._widgetState(thisWidget, "index", 1)
             end
         end,
-        UpdateState = function(_thisWidget: Types.Tab)
+        UpdateState = function(_thisWidget)
         end,
-        Discard = function(thisWidget: Types.TabBar)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 
     --stylua: ignore
     Iris.WidgetConstructor("Tab", {
@@ -129,44 +129,44 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["Hideable"] = 2,
         },
         Events = {
-            ["clicked"] = widgets.EVENTS.click(function(thisWidget: Types.Widget)
+            ["clicked"] = widgets.EVENTS.click(function(thisWidget)
                 return thisWidget.Instance
             end),
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
             ["selected"] = {
-                ["Init"] = function(_thisWidget: Types.Tab) end,
-                ["Get"] = function(thisWidget: Types.Tab)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastSelectedTick == Iris._cycleTick
                 end,
             },
             ["unselected"] = {
-                ["Init"] = function(_thisWidget: Types.Tab) end,
-                ["Get"] = function(thisWidget: Types.Tab)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastUnselectedTick == Iris._cycleTick
                 end,
             },
             ["active"] = {
-                ["Init"] = function(_thisWidget: Types.Tab) end,
-                ["Get"] = function(thisWidget: Types.Tab)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.state.index.value == thisWidget.Index
                 end,
             },
             ["opened"] = {
-                ["Init"] = function(_thisWidget: Types.Tab) end,
-                ["Get"] = function(thisWidget: Types.Tab)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastOpenedTick == Iris._cycleTick
                 end,
             },
             ["closed"] = {
-                ["Init"] = function(_thisWidget: Types.Tab) end,
-                ["Get"] = function(thisWidget: Types.Tab)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastClosedTick == Iris._cycleTick
                 end,
             },
         },
-        Generate = function(thisWidget: Types.Tab)
+        Generate = function(thisWidget)
             local Tab = Instance.new("TextButton")
             Tab.Name = "Iris_Tab"
             Tab.AutomaticSize = Enum.AutomaticSize.XY
@@ -267,7 +267,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Tab
         end,
-        Update = function(thisWidget: Types.Tab)
+        Update = function(thisWidget)
             local Tab = thisWidget.Instance :: TextButton
             local TextLabel: TextLabel = Tab.TextLabel
             local CloseButton: TextButton = Tab.CloseButton
@@ -275,10 +275,10 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             TextLabel.Text = thisWidget.arguments.Text
             CloseButton.Visible = if thisWidget.arguments.Hideable == true then true else false
         end,
-        ChildAdded = function(thisWidget: Types.Tab, _thisChild: Types.Widget)
+        ChildAdded = function(thisWidget, _thisChild)
             return thisWidget.ChildContainer
         end,
-        GenerateState = function(thisWidget: Types.Tab)
+        GenerateState = function(thisWidget)
             thisWidget.state.index = thisWidget.parentWidget.state.index
             thisWidget.state.index.ConnectedWidgets[thisWidget.ID] = thisWidget
 
@@ -286,7 +286,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.state.isOpened = Iris._widgetState(thisWidget, "isOpened", true)
             end
         end,
-        UpdateState = function(thisWidget: Types.Tab)
+        UpdateState = function(thisWidget)
             local Tab = thisWidget.Instance :: TextButton
             local Container = thisWidget.ChildContainer :: Frame
 
@@ -320,7 +320,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end
         end,
-        Discard = function(thisWidget: Types.Tab)
+        Discard = function(thisWidget)
             if thisWidget.state.isOpened.value == true then
                 closeTab(thisWidget.parentWidget, thisWidget.Index)
             end
@@ -329,5 +329,5 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             thisWidget.ChildContainer:Destroy()
             widgets.discardState(thisWidget)
         end
-    } :: Types.WidgetClass)
+    })
 end

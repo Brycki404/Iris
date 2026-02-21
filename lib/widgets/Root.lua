@@ -1,6 +1,6 @@
-local Types = require(script.Parent.Parent.Types)
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+
+return function(Iris, widgets)
     local NumNonWindowChildren: number = 0
 
     --stylua: ignore
@@ -9,7 +9,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         hasChildren = true,
         Args = {},
         Events = {},
-        Generate = function(_thisWidget: Types.Root)
+        Generate = function(_thisWidget)
             local Root = Instance.new("Folder")
             Root.Name = "Iris_Root"
 
@@ -97,7 +97,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Root
         end,
-        Update = function(thisWidget: Types.Root)
+        Update = function(thisWidget)
             if NumNonWindowChildren > 0 then
                 local Root = thisWidget.Instance :: any
                 local PseudoWindowScreenGui = Root.PseudoWindowScreenGui :: any
@@ -105,11 +105,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 PseudoWindow.Visible = true
             end
         end,
-        Discard = function(thisWidget: Types.Root)
+        Discard = function(thisWidget)
             NumNonWindowChildren = 0
             thisWidget.Instance:Destroy()
         end,
-        ChildAdded = function(thisWidget: Types.Root, thisChild: Types.Widget)
+        ChildAdded = function(thisWidget, thisChild)
             local Root = thisWidget.Instance :: any
 
             if thisChild.type == "Window" then
@@ -128,7 +128,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 return PseudoWindow
             end
         end,
-        ChildDiscarded = function(thisWidget: Types.Root, thisChild: Types.Widget)
+        ChildDiscarded = function(thisWidget, thisChild)
             if thisChild.type ~= "Window" and thisChild.type ~= "Tooltip" and thisChild.type ~= "MenuBar" then
                 NumNonWindowChildren -= 1
                 if NumNonWindowChildren == 0 then
@@ -139,5 +139,5 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end
         end,
-    } :: Types.WidgetClass)
+    })
 end

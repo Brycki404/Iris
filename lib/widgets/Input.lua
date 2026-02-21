@@ -1,17 +1,15 @@
-local Types = require(script.Parent.Parent.Types)
-
 type InputDataTypes = "Num" | "Vector2" | "Vector3" | "UDim" | "UDim2" | "Color3" | "Color4" | "Rect" | "Enum" | "" | string
 type InputType = "Input" | "Drag" | "Slider"
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+return function(Iris, widgets)
     local numberChanged = {
-        ["Init"] = function(_thisWidget: Types.Widget) end,
-        ["Get"] = function(thisWidget: Types.Input<any>)
+        ["Init"] = function(_thisWidget) end,
+        ["Get"] = function(thisWidget)
             return thisWidget.lastNumberChangedTick == Iris._cycleTick
         end,
     }
 
-    local function getValueByIndex<T>(value: T, index: number, arguments: Types.Arguments)
+    local function getValueByIndex<T>(value: T, index: number, arguments)
         local val = value :: unknown
         if typeof(val) == "number" then
             return val
@@ -71,7 +69,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         error(`Incorrect datatype or value: {value} {typeof(value)} {index}.`)
     end
 
-    local function updateValueByIndex<T>(value: T, index: number, newValue: number, arguments: Types.Arguments): T
+    local function updateValueByIndex<T>(value: T, index: number, newValue: number, arguments): T
         local val = value :: unknown
         if typeof(val) == "number" then
             return newValue :: any
@@ -191,7 +189,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         Rect = { 0, 0, 0, 0 },
     }
 
-    local function generateAbstract<T>(inputType: InputType, dataType: InputDataTypes, components: number, defaultValue: T): Types.WidgetClass
+    local function generateAbstract<T>(inputType: InputType, dataType: InputDataTypes, components: number, defaultValue: T)
         return {
             hasState = true,
             hasChildren = false,
@@ -204,11 +202,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             },
             Events = {
                 ["numberChanged"] = numberChanged,
-                ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+                ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                     return thisWidget.Instance
                 end),
             },
-            GenerateState = function(thisWidget: Types.Input<T>)
+            GenerateState = function(thisWidget)
                 if thisWidget.state.number == nil then
                     thisWidget.state.number = Iris._widgetState(thisWidget, "number", defaultValue)
                 end
@@ -216,7 +214,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                     thisWidget.state.editingText = Iris._widgetState(thisWidget, "editingText", 0)
                 end
             end,
-            Update = function(thisWidget: Types.Input<T>)
+            Update = function(thisWidget)
                 local Input = thisWidget.Instance :: GuiObject
                 local TextLabel: TextLabel = Input.TextLabel
                 TextLabel.Text = thisWidget.arguments.Text or `Input {dataType}`
@@ -291,14 +289,14 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                     end
                 end
             end,
-            Discard = function(thisWidget: Types.Input<T>)
+            Discard = function(thisWidget)
                 thisWidget.Instance:Destroy()
                 widgets.discardState(thisWidget)
             end,
-        } :: Types.WidgetClass
+        }
     end
 
-    local function focusLost<T>(thisWidget: Types.Input<T>, InputField: TextBox, index: number, dataType: InputDataTypes)
+    local function focusLost<T>(thisWidget, InputField: TextBox, index: number, dataType: InputDataTypes)
         local newValue = tonumber(InputField.Text:match("-?%d*%.?%d*"))
         local state = thisWidget.state.number
         local widget = thisWidget
@@ -344,9 +342,9 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
     --[[
         Input
     ]]
-    local generateInputScalar: <T>(dataType: InputDataTypes, components: number, defaultValue: T) -> Types.WidgetClass
+    local generateInputScalar: <T>(dataType: InputDataTypes, components: number, defaultValue: T)
     do
-        local function generateButtons(thisWidget: Types.Input<number>, parent: GuiObject, textHeight: number)
+        local function generateButtons(thisWidget, parent: GuiObject, textHeight: number)
             local SubButton = widgets.abstractButton.Generate(thisWidget) :: TextButton
             SubButton.Name = "SubButton"
             SubButton.Size = UDim2.fromOffset(Iris._config.TextSize + 2 * Iris._config.FramePadding.Y, Iris._config.TextSize)
@@ -358,13 +356,13 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             widgets.applyButtonClick(SubButton, function()
                 local isCtrlHeld = widgets.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or widgets.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
-                local changeValue = (thisWidget.arguments.Increment and getValueByIndex(thisWidget.arguments.Increment, 1, thisWidget.arguments :: Types.Argument) or 1) * (isCtrlHeld and 100 or 1)
+                local changeValue = (thisWidget.arguments.Increment and getValueByIndex(thisWidget.arguments.Increment, 1, thisWidget.arguments) or 1) * (isCtrlHeld and 100 or 1)
                 local newValue = thisWidget.state.number.value - changeValue
                 if thisWidget.arguments.Min ~= nil then
-                    newValue = math.max(newValue, getValueByIndex(thisWidget.arguments.Min, 1, thisWidget.arguments :: Types.Argument))
+                    newValue = math.max(newValue, getValueByIndex(thisWidget.arguments.Min, 1, thisWidget.arguments))
                 end
                 if thisWidget.arguments.Max ~= nil then
-                    newValue = math.min(newValue, getValueByIndex(thisWidget.arguments.Max, 1, thisWidget.arguments :: Types.Argument))
+                    newValue = math.min(newValue, getValueByIndex(thisWidget.arguments.Max, 1, thisWidget.arguments))
                 end
                 thisWidget.state.number:set(newValue)
                 thisWidget.lastNumberChangedTick = Iris._cycleTick + 1
@@ -381,13 +379,13 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             widgets.applyButtonClick(AddButton, function()
                 local isCtrlHeld = widgets.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or widgets.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
-                local changeValue = (thisWidget.arguments.Increment and getValueByIndex(thisWidget.arguments.Increment, 1, thisWidget.arguments :: Types.Argument) or 1) * (isCtrlHeld and 100 or 1)
+                local changeValue = (thisWidget.arguments.Increment and getValueByIndex(thisWidget.arguments.Increment, 1, thisWidget.arguments) or 1) * (isCtrlHeld and 100 or 1)
                 local newValue = thisWidget.state.number.value + changeValue
                 if thisWidget.arguments.Min ~= nil then
-                    newValue = math.max(newValue, getValueByIndex(thisWidget.arguments.Min, 1, thisWidget.arguments :: Types.Argument))
+                    newValue = math.max(newValue, getValueByIndex(thisWidget.arguments.Min, 1, thisWidget.arguments))
                 end
                 if thisWidget.arguments.Max ~= nil then
-                    newValue = math.min(newValue, getValueByIndex(thisWidget.arguments.Max, 1, thisWidget.arguments :: Types.Argument))
+                    newValue = math.min(newValue, getValueByIndex(thisWidget.arguments.Max, 1, thisWidget.arguments))
                 end
                 thisWidget.state.number:set(newValue)
                 thisWidget.lastNumberChangedTick = Iris._cycleTick + 1
@@ -396,7 +394,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             return 2 * Iris._config.ItemInnerSpacing.X + 2 * textHeight
         end
 
-        local function generateField<T>(thisWidget: Types.Input<T>, index: number, componentWidth: UDim, dataType: InputDataTypes)
+        local function generateField<T>(thisWidget, index: number, componentWidth: UDim, dataType: InputDataTypes)
             local InputField = Instance.new("TextBox")
             InputField.Name = "InputField" .. tostring(index)
             InputField.AutomaticSize = Enum.AutomaticSize.Y
@@ -432,7 +430,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             local input = generateAbstract("Input", dataType, components, defaultValue)
 
             return widgets.extend(input, {
-                Generate = function(thisWidget: Types.Input<T>)
+                Generate = function(thisWidget)
                     local Input = Instance.new("Frame")
                     Input.Name = "Iris_Input" .. dataType
                     Input.AutomaticSize = Enum.AutomaticSize.Y
@@ -475,7 +473,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
                     return Input
                 end,
-                UpdateState = function(thisWidget: Types.Input<T>)
+                UpdateState = function(thisWidget)
                     local Input = thisWidget.Instance :: GuiObject
 
                     for index = 1, components do
@@ -494,12 +492,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
     --[[
         Drag
     ]]
-    local generateDragScalar: <T>(dataType: InputDataTypes, components: number, defaultValue: T) -> Types.WidgetClass
-    local generateColorDragScalar: (dataType: InputDataTypes, ...any) -> Types.WidgetClass
+    local generateDragScalar: <T>(dataType: InputDataTypes, components: number, defaultValue: T)
+    local generateColorDragScalar: (dataType: InputDataTypes, ...any)
     do
         local PreviouseMouseXPosition = 0
         local AnyActiveDrag = false
-        local ActiveDrag: Types.Input<Types.InputDataType>? = nil
+        local ActiveDrag = nil
         local ActiveIndex = 0
         local ActiveDataType: InputDataTypes | "" = ""
 
@@ -543,7 +541,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ActiveDrag.lastNumberChangedTick = Iris._cycleTick + 1
         end
 
-        local function DragMouseDown(thisWidget: Types.Input<Types.InputDataType>, dataTypes: InputDataTypes, index: number, x: number, y: number)
+        local function DragMouseDown(thisWidget, dataTypes: InputDataTypes, index: number, x: number, y: number)
             local currentTime = widgets.getTime()
             local isTimeValid = currentTime - thisWidget.lastClickedTime < Iris._config.MouseDoubleClickTime
             local isCtrlHeld = widgets.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or widgets.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
@@ -579,7 +577,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             end
         end)
 
-        local function generateField<T>(thisWidget: Types.Input<T>, index: number, componentSize: UDim2, dataType: InputDataTypes)
+        local function generateField<T>(thisWidget, index: number, componentSize: UDim2, dataType: InputDataTypes)
             local DragField = Instance.new("TextButton")
             DragField.Name = "DragField" .. tostring(index)
             DragField.AutomaticSize = Enum.AutomaticSize.Y
@@ -643,7 +641,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             local input = generateAbstract("Drag", dataType, components, defaultValue)
 
             return widgets.extend(input, {
-                Generate = function(thisWidget: Types.Input<T>)
+                Generate = function(thisWidget)
                     thisWidget.lastClickedTime = -1
                     thisWidget.lastClickedPosition = Vector2.zero
 
@@ -700,7 +698,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
                     return Drag
                 end,
-                UpdateState = function(thisWidget: Types.Input<T>)
+                UpdateState = function(thisWidget)
                     local Drag = thisWidget.Instance :: Frame
 
                     local widget = thisWidget :: any
@@ -760,7 +758,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                     ["UseHSV"] = 3,
                     ["Format"] = 4,
                 },
-                Update = function(thisWidget: Types.InputColor4)
+                Update = function(thisWidget)
                     local Input = thisWidget.Instance :: GuiObject
                     local TextLabel: TextLabel = Input.TextLabel
                     TextLabel.Text = thisWidget.arguments.Text or `Drag {dataType}`
@@ -791,7 +789,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                         Iris._widgets[thisWidget.type].UpdateState(thisWidget)
                     end
                 end,
-                GenerateState = function(thisWidget: Types.InputColor4)
+                GenerateState = function(thisWidget)
                     if thisWidget.state.color == nil then
                         thisWidget.state.color = Iris._widgetState(thisWidget, "color", defaultValues[1])
                     end
@@ -811,11 +809,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
     --[[
         Slider
     ]]
-    local generateSliderScalar: <T>(dataType: InputDataTypes, components: number, defaultValue: T) -> Types.WidgetClass
-    local generateEnumSliderScalar: (enum: Enum, item: EnumItem) -> Types.WidgetClass
+    local generateSliderScalar: <T>(dataType: InputDataTypes, components: number, defaultValue: T)
+    local generateEnumSliderScalar: (enum: Enum, item: EnumItem)
     do
         local AnyActiveSlider = false
-        local ActiveSlider: Types.Input<Types.InputDataType>? = nil
+        local ActiveSlider = nil
         local ActiveIndex = 0
         local ActiveDataType: InputDataTypes | "" = ""
 
@@ -845,7 +843,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ActiveSlider.lastNumberChangedTick = Iris._cycleTick + 1
         end
 
-        local function SliderMouseDown(thisWidget: Types.Input<Types.InputDataType>, dataType: InputDataTypes, index: number)
+        local function SliderMouseDown(thisWidget, dataType: InputDataTypes, index: number)
             local isCtrlHeld = widgets.UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or widgets.UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
             if isCtrlHeld then
                 thisWidget.state.editingText:set(index)
@@ -877,7 +875,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             end
         end)
 
-        local function generateField<T>(thisWidget: Types.Input<T>, index: number, componentSize: UDim2, dataType: InputDataTypes)
+        local function generateField<T>(thisWidget, index: number, componentSize: UDim2, dataType: InputDataTypes)
             local SliderField = Instance.new("TextButton")
             SliderField.Name = "SliderField" .. tostring(index)
             SliderField.AutomaticSize = Enum.AutomaticSize.Y
@@ -979,7 +977,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             local input = generateAbstract("Slider", dataType, components, defaultValue)
 
             return widgets.extend(input, {
-                Generate = function(thisWidget: Types.Input<T>)
+                Generate = function(thisWidget)
                     local Slider = Instance.new("Frame")
                     Slider.Name = "Iris_Slider" .. dataType
                     Slider.AutomaticSize = Enum.AutomaticSize.Y
@@ -1013,7 +1011,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
                     return Slider
                 end,
-                UpdateState = function(thisWidget: Types.Input<T>)
+                UpdateState = function(thisWidget)
                     local Slider = thisWidget.Instance :: Frame
 
                     for index = 1, components do
@@ -1060,7 +1058,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         end
 
         function generateEnumSliderScalar(enum: Enum, item: EnumItem)
-            local input: Types.WidgetClass = generateSliderScalar("Enum", 1, item.Value)
+            local input = generateSliderScalar("Enum", 1, item.Value)
             local valueToName = { string }
 
             for _, enumItem in enum:GetEnumItems() do
@@ -1071,7 +1069,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 Args = {
                     ["Text"] = 1,
                 },
-                Update = function(thisWidget: Types.InputEnum)
+                Update = function(thisWidget)
                     local Input = thisWidget.Instance :: GuiObject
                     local TextLabel: TextLabel = Input.TextLabel
                     TextLabel.Text = thisWidget.arguments.Text or "Input Enum"
@@ -1087,7 +1085,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
                     GrabBar.Size = UDim2.fromScale(grabScaleSize, 1)
                 end,
-                GenerateState = function(thisWidget: Types.InputEnum)
+                GenerateState = function(thisWidget)
                     if thisWidget.state.number == nil then
                         thisWidget.state.number = Iris._widgetState(thisWidget, "number", item.Value)
                     end
@@ -1103,7 +1101,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
     end
 
     do
-        local inputNum: Types.WidgetClass = generateInputScalar("Num", 1, 0)
+        local inputNum = generateInputScalar("Num", 1, 0)
         inputNum.Args["NoButtons"] = 6
         Iris.WidgetConstructor("InputNum", inputNum)
     end
@@ -1143,18 +1141,18 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         },
         Events = {
             ["textChanged"] = {
-                ["Init"] = function(thisWidget: Types.InputText)
+                ["Init"] = function(thisWidget)
                     thisWidget.lastTextChangedTick = 0
                 end,
-                ["Get"] = function(thisWidget: Types.InputText)
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastTextChangedTick == Iris._cycleTick
                 end,
             },
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(thisWidget: Types.InputText)
+        Generate = function(thisWidget)
             local InputText: Frame = Instance.new("Frame")
             InputText.Name = "Iris_InputText"
             InputText.AutomaticSize = Enum.AutomaticSize.Y
@@ -1203,12 +1201,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return InputText
         end,
-        GenerateState = function(thisWidget: Types.InputText)
+        GenerateState = function(thisWidget)
             if thisWidget.state.text == nil then
                 thisWidget.state.text = Iris._widgetState(thisWidget, "text", "")
             end
         end,
-        Update = function(thisWidget: Types.InputText)
+        Update = function(thisWidget)
             local InputText = thisWidget.Instance :: Frame
             local TextLabel: TextLabel = InputText.TextLabel
             local InputField: TextBox = InputText.InputField
@@ -1218,15 +1216,15 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             InputField.TextEditable = not thisWidget.arguments.ReadOnly
             InputField.MultiLine = thisWidget.arguments.MultiLine or false
         end,
-        UpdateState = function(thisWidget: Types.InputText)
+        UpdateState = function(thisWidget)
             local InputText = thisWidget.Instance :: Frame
             local InputField: TextBox = InputText.InputField
     
             InputField.Text = thisWidget.state.text.value
         end,
-        Discard = function(thisWidget: Types.InputText)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
             widgets.discardState(thisWidget)
         end,
-    } :: Types.WidgetClass)
+    })
 end

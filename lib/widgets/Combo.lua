@@ -1,6 +1,4 @@
-local Types = require(script.Parent.Parent.Types)
-
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+return function(Iris, widgets)
     --stylua: ignore
     Iris.WidgetConstructor("Selectable", {
         hasState = true,
@@ -12,45 +10,45 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         },
         Events = {
             ["selected"] = {
-                ["Init"] = function(_thisWidget: Types.Selectable) end,
-                ["Get"] = function(thisWidget: Types.Selectable)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastSelectedTick == Iris._cycleTick
                 end,
             },
             ["unselected"] = {
-                ["Init"] = function(_thisWidget: Types.Selectable) end,
-                ["Get"] = function(thisWidget: Types.Selectable)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastUnselectedTick == Iris._cycleTick
                 end,
             },
             ["active"] = {
-                ["Init"] = function(_thisWidget: Types.Selectable) end,
-                ["Get"] = function(thisWidget: Types.Selectable)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.state.index.value == thisWidget.arguments.Index
                 end,
             },
-            ["clicked"] = widgets.EVENTS.click(function(thisWidget: Types.Widget)
+            ["clicked"] = widgets.EVENTS.click(function(thisWidget)
                 local Selectable = thisWidget.Instance :: Frame
                 return Selectable.SelectableButton
             end),
-            ["rightClicked"] = widgets.EVENTS.rightClick(function(thisWidget: Types.Widget)
+            ["rightClicked"] = widgets.EVENTS.rightClick(function(thisWidget)
                 local Selectable = thisWidget.Instance :: Frame
                 return Selectable.SelectableButton
             end),
-            ["doubleClicked"] = widgets.EVENTS.doubleClick(function(thisWidget: Types.Widget)
+            ["doubleClicked"] = widgets.EVENTS.doubleClick(function(thisWidget)
                 local Selectable = thisWidget.Instance :: Frame
                 return Selectable.SelectableButton
             end),
-            ["ctrlClicked"] = widgets.EVENTS.ctrlClick(function(thisWidget: Types.Widget)
+            ["ctrlClicked"] = widgets.EVENTS.ctrlClick(function(thisWidget)
                 local Selectable = thisWidget.Instance :: Frame
                 return Selectable.SelectableButton
             end),
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 local Selectable = thisWidget.Instance :: Frame
                 return Selectable.SelectableButton
             end),
         },
-        Generate = function(thisWidget: Types.Selectable)
+        Generate = function(thisWidget)
             local Selectable = Instance.new("Frame")
             Selectable.Name = "Iris_Selectable"
             Selectable.Size = UDim2.new(Iris._config.ItemWidth, UDim.new(0, Iris._config.TextSize + 2 * Iris._config.FramePadding.Y - Iris._config.ItemSpacing.Y))
@@ -93,7 +91,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Selectable
         end,
-        GenerateState = function(thisWidget: Types.Selectable)
+        GenerateState = function(thisWidget)
             if thisWidget.state.index == nil then
                 if thisWidget.arguments.Index ~= nil then
                     error("A shared state index is required for Iris.Selectables() with an Index argument.", 5)
@@ -101,12 +99,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.state.index = Iris._widgetState(thisWidget, "index", false)
             end
         end,
-        Update = function(thisWidget: Types.Selectable)
+        Update = function(thisWidget)
             local Selectable = thisWidget.Instance :: Frame
             local SelectableButton: TextButton = Selectable.SelectableButton
             SelectableButton.Text = thisWidget.arguments.Text or "Selectable"
         end,
-        UpdateState = function(thisWidget: Types.Selectable)
+        UpdateState = function(thisWidget)
             local Selectable = thisWidget.Instance :: Frame
             local SelectableButton: TextButton = Selectable.SelectableButton
             
@@ -120,18 +118,18 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.lastUnselectedTick = Iris._cycleTick + 1
             end
         end,
-        Discard = function(thisWidget: Types.Selectable)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
             widgets.discardState(thisWidget)
         end,
-    } :: Types.WidgetClass)
+    })
 
     local AnyOpenedCombo = false
     local ComboOpenedTick = -1
-    local OpenedCombo: Types.Combo? = nil
+    local OpenedCombo = nil
     local CachedContentSize = 0
 
-    local function UpdateChildContainerTransform(thisWidget: Types.Combo)
+    local function UpdateChildContainerTransform(thisWidget)
         local Combo = thisWidget.Instance :: Frame
         local PreviewContainer = Combo.PreviewContainer :: TextButton
         local ChildContainer = thisWidget.ChildContainer :: ScrollingFrame
@@ -223,32 +221,32 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         },
         Events = {
             ["opened"] = {
-                ["Init"] = function(_thisWidget: Types.Combo) end,
-                ["Get"] = function(thisWidget: Types.Combo)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastOpenedTick == Iris._cycleTick
                 end,
             },
             ["closed"] = {
-                ["Init"] = function(_thisWidget: Types.Combo) end,
-                ["Get"] = function(thisWidget: Types.Combo)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastClosedTick == Iris._cycleTick
                 end,
             },
             ["changed"] = {
-                ["Init"] = function(_thisWidget: Types.Combo) end,
-                ["Get"] = function(thisWidget: Types.Combo)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastChangedTick == Iris._cycleTick
                 end,
             },
-            ["clicked"] = widgets.EVENTS.click(function(thisWidget: Types.Widget)
+            ["clicked"] = widgets.EVENTS.click(function(thisWidget)
                 local Combo = thisWidget.Instance :: Frame
                 return Combo.PreviewContainer
             end),
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(thisWidget: Types.Combo)
+        Generate = function(thisWidget)
             local frameHeight = Iris._config.TextSize + 2 * Iris._config.FramePadding.Y
 
             local Combo = Instance.new("Frame")
@@ -398,7 +396,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             thisWidget.UIListLayout = ChildContainerUIListLayout
             return Combo
         end,
-        GenerateState = function(thisWidget: Types.Combo)
+        GenerateState = function(thisWidget)
             if thisWidget.state.index == nil then
                 thisWidget.state.index = Iris._widgetState(thisWidget, "index", "No Selection")
             end
@@ -413,7 +411,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end)
         end,
-        Update = function(thisWidget: Types.Combo)
+        Update = function(thisWidget)
             local Iris_Combo = thisWidget.Instance :: Frame
             local PreviewContainer = Iris_Combo.PreviewContainer :: TextButton
             local PreviewLabel: TextLabel = PreviewContainer.PreviewLabel
@@ -441,7 +439,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 PreviewContainer.AutomaticSize = Enum.AutomaticSize.Y
             end
         end,
-        UpdateState = function(thisWidget: Types.Combo)
+        UpdateState = function(thisWidget)
             local Combo = thisWidget.Instance :: Frame
             local ChildContainer = thisWidget.ChildContainer :: ScrollingFrame
             local PreviewContainer = Combo.PreviewContainer :: TextButton
@@ -473,11 +471,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             local stateIndex = thisWidget.state.index.value
             PreviewLabel.Text = if typeof(stateIndex) == "EnumItem" then stateIndex.Name else tostring(stateIndex)
         end,
-        ChildAdded = function(thisWidget: Types.Combo, _thisChild: Types.Widget)
+        ChildAdded = function(thisWidget, _thisChild)
             UpdateChildContainerTransform(thisWidget)
             return thisWidget.ChildContainer
         end,
-        Discard = function(thisWidget: Types.Combo)
+        Discard = function(thisWidget)
             -- If we are discarding the current combo active, we need to hide it
             if OpenedCombo and OpenedCombo == thisWidget then
                 OpenedCombo = nil
@@ -488,5 +486,5 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             thisWidget.ChildContainer:Destroy()
             widgets.discardState(thisWidget)
         end,
-    } :: Types.WidgetClass)
+    })
 end

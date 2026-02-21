@@ -1,4 +1,4 @@
-local Types = require(script.Parent.Parent.Types)
+
 
 -- Tables need an overhaul.
 
@@ -29,17 +29,17 @@ local Types = require(script.Parent.Parent.Types)
 	Iris.SetColumnWidth(index: number, width: number | UDim)
 ]]
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
-    local Tables: { [Types.ID]: Types.Table } = {}
-    local TableMinWidths: { [Types.Table]: { boolean } } = {}
+return function(Iris, widgets)
+    local Tables = {}
+    local TableMinWidths = {}
     local AnyActiveTable = false
-    local ActiveTable: Types.Table? = nil
+    local ActiveTable = nil
     local ActiveColumn = 0
     local ActiveLeftWidth = -1
     local ActiveRightWidth = -1
     local MousePositionX = 0
 
-    local function CalculateMinColumnWidth(thisWidget: Types.Table, index: number)
+    local function CalculateMinColumnWidth(thisWidget, index: number)
         local width = 0
         for _, row in thisWidget._cellInstances do
             local cell = row[index]
@@ -151,7 +151,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         widths:set(widths.value, true)
     end
 
-    local function ColumnMouseDown(thisWidget: Types.Table, index: number)
+    local function ColumnMouseDown(thisWidget, index: number)
         AnyActiveTable = true
         ActiveTable = thisWidget
         ActiveColumn = index
@@ -181,7 +181,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         end
     end)
 
-    local function GenerateCell(_thisWidget: Types.Table, index: number, width: UDim, header: boolean)
+    local function GenerateCell(_thisWidget, index: number, width: UDim, header: boolean)
         local Cell: TextButton
         if header then
             Cell = Instance.new("TextButton")
@@ -216,7 +216,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         return Cell
     end
 
-    local function GenerateColumnBorder(thisWidget: Types.Table, index: number, style: "Light" | "Strong")
+    local function GenerateColumnBorder(thisWidget, index: number, style: "Light" | "Strong")
         local Border = Instance.new("ImageButton")
         Border.Name = `Border_{index}`
         Border.Size = UDim2.new(0, 5, 1, 0)
@@ -270,7 +270,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
     end
 
     -- creates a new row and all columns, and adds all to the table's row and cell instance tables, but does not parent
-    local function GenerateRow(thisWidget: Types.Table, index: number)
+    local function GenerateRow(thisWidget, index: number)
         local Row: Frame = Instance.new("Frame")
         Row.Name = `Row_{index}`
         Row.AutomaticSize = Enum.AutomaticSize.Y
@@ -308,7 +308,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         return Row
     end
 
-    local function GenerateRowBorder(_thisWidget: Types.Table, index: number, style: "Light" | "Strong")
+    local function GenerateRowBorder(_thisWidget, index: number, style: "Light" | "Strong")
         local Border = Instance.new("Frame")
         Border.Name = `Border_{index}`
         Border.Size = UDim2.fromScale(1, 0)
@@ -345,7 +345,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             LimitTableWidth = 9,
         },
         Events = {},
-        Generate = function(thisWidget: Types.Table)
+        Generate = function(thisWidget)
             Tables[thisWidget.ID] = thisWidget
             TableMinWidths[thisWidget] = {}
 
@@ -403,7 +403,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Table
         end,
-        GenerateState = function(thisWidget: Types.Table)
+        GenerateState = function(thisWidget)
             local NumColumns = thisWidget.arguments.NumColumns
             if thisWidget.state.widths == nil then
                 local Widths: { number } = table.create(NumColumns, 1 / NumColumns)
@@ -437,7 +437,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             thisWidget._columnBorders[0] = TableColumnBorder
             TableColumnBorder.Parent = Table
         end,
-        Update = function(thisWidget: Types.Table)
+        Update = function(thisWidget)
             local NumColumns = thisWidget.arguments.NumColumns
             assert(NumColumns >= 1, "Iris.Table must have at least one column.")
 
@@ -509,7 +509,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 Iris._widgets["Table"].UpdateState(thisWidget)
             end
         end,
-        UpdateState = function(thisWidget: Types.Table)
+        UpdateState = function(thisWidget)
             local Table = thisWidget.Instance :: Frame
             local BorderContainer = Table.BorderContainer :: Frame
             local RowContainer = Table.RowContainer :: Frame
@@ -584,7 +584,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             RowContainer.UISizeConstraint.MaxSize = Vector2.new(Width, math.huge)
             thisWidget._columnBorders[0].Position = UDim2.fromOffset(Width - 3, 0)
         end,
-        ChildAdded = function(thisWidget: Types.Table, _: Types.Widget)
+        ChildAdded = function(thisWidget, _)
             local rowIndex = thisWidget._rowIndex
             local columnIndex = thisWidget._columnIndex
             -- determine if the row exists yet
@@ -611,7 +611,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return thisWidget._cellInstances[rowIndex][columnIndex]
         end,
-        ChildDiscarded = function(thisWidget: Types.Table, thisChild: Types.Widget)
+        ChildDiscarded = function(thisWidget, thisChild)
             local Cell = thisChild.Instance.Parent
 
             if Cell ~= nil then
@@ -622,11 +622,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end
         end,
-        Discard = function(thisWidget: Types.Table)
+        Discard = function(thisWidget)
             Tables[thisWidget.ID] = nil
             TableMinWidths[thisWidget] = nil
             thisWidget.Instance:Destroy()
             widgets.discardState(thisWidget)
         end
-    } :: Types.WidgetClass)
+    })
 end

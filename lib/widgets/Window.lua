@@ -1,6 +1,6 @@
-local Types = require(script.Parent.Parent.Types)
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+
+return function(Iris, widgets)
     local function relocateTooltips()
         if Iris._rootInstance == nil then
             return
@@ -27,7 +27,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["Text"] = 1,
         },
         Events = {},
-        Generate = function(thisWidget: Types.Tooltip)
+        Generate = function(thisWidget)
             thisWidget.parentWidget = Iris._rootWidget -- only allow root as parent
 
             local Tooltip = Instance.new("Frame")
@@ -55,7 +55,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Tooltip
         end,
-        Update = function(thisWidget: Types.Tooltip)
+        Update = function(thisWidget)
             local Tooltip = thisWidget.Instance :: Frame
             local TooltipText: TextLabel = Tooltip.TooltipText
             if thisWidget.arguments.Text == nil then
@@ -64,17 +64,17 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             TooltipText.Text = thisWidget.arguments.Text
             relocateTooltips()
         end,
-        Discard = function(thisWidget: Types.Tooltip)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 
     local windowDisplayOrder = 0 -- incremental count which is used for determining focused windows ZIndex
-    local dragWindow: Types.Window? -- window being dragged, may be nil
+    local dragWindow -- window being dragged, may be nil
     local isDragging = false
     local moveDeltaCursorPosition: Vector2 -- cursor offset from drag origin (top left of window)
 
-    local resizeWindow: Types.Window? -- window being resized, may be nil
+    local resizeWindow -- window being resized, may be nil
     local isResizing = false
     local isInsideResize = false -- is cursor inside of the focused window resize outer padding
     local isInsideWindow = false -- is cursor inside of the focused window
@@ -83,10 +83,10 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
     local lastCursorPosition: Vector2
 
-    local focusedWindow: Types.Window? -- window with focus, may be nil
+    local focusedWindow -- window with focus, may be nil
     local anyFocusedWindow = false -- is there any focused window?
 
-    local windowWidgets: { [Types.ID]: Types.Window } = {} -- array of widget objects of type window
+    local windowWidgets = {} -- array of widget objects of type window
 
     local function quickSwapWindows()
         -- ctrl + tab swapping functionality
@@ -95,7 +95,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         end
 
         local lowest = 0xFFFF
-        local lowestWidget: Types.Window
+        local lowestWidget
 
         for _, widget in windowWidgets do
             if widget.state.isOpened.value and not widget.arguments.NoNav then
@@ -119,7 +119,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         Iris.SetFocusedWindow(lowestWidget)
     end
 
-    local function fitSizeToWindowBounds(thisWidget: Types.Window, intentedSize: Vector2)
+    local function fitSizeToWindowBounds(thisWidget, intentedSize: Vector2)
         local windowSize = Vector2.new(thisWidget.state.position.value.X, thisWidget.state.position.value.Y)
         local minWindowSize = (Iris._config.TextSize + 2 * Iris._config.FramePadding.Y) * 2
         local usableSize = widgets.getScreenSizeForWindow(thisWidget)
@@ -129,7 +129,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         return Vector2.new(math.clamp(intentedSize.X, minWindowSize, math.max(maxWindowSize.X, minWindowSize)), math.clamp(intentedSize.Y, minWindowSize, math.max(maxWindowSize.Y, minWindowSize)))
     end
 
-    local function fitPositionToWindowBounds(thisWidget: Types.Window, intendedPosition: Vector2)
+    local function fitPositionToWindowBounds(thisWidget, intendedPosition: Vector2)
         local thisWidgetInstance = thisWidget.Instance
         local usableSize = widgets.getScreenSizeForWindow(thisWidget)
         local safeAreaPadding = Vector2.new(Iris._config.WindowBorderSize + Iris._config.DisplaySafeAreaPadding.X, Iris._config.WindowBorderSize + Iris._config.DisplaySafeAreaPadding.Y)
@@ -140,7 +140,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         )
     end
 
-    Iris.SetFocusedWindow = function(thisWidget: Types.Window?)
+    Iris.SetFocusedWindow = function(thisWidget)
         if focusedWindow == thisWidget then
             return
         end
@@ -349,35 +349,35 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         },
         Events = {
             ["closed"] = {
-                ["Init"] = function(_thisWidget: Types.Window) end,
-                ["Get"] = function(thisWidget: Types.Window)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastClosedTick == Iris._cycleTick
                 end,
             },
             ["opened"] = {
-                ["Init"] = function(_thisWidget: Types.Window) end,
-                ["Get"] = function(thisWidget: Types.Window)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastOpenedTick == Iris._cycleTick
                 end,
             },
             ["collapsed"] = {
-                ["Init"] = function(_thisWidget: Types.Window) end,
-                ["Get"] = function(thisWidget: Types.Window)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastCollapsedTick == Iris._cycleTick
                 end,
             },
             ["uncollapsed"] = {
-                ["Init"] = function(_thisWidget: Types.Window) end,
-                ["Get"] = function(thisWidget: Types.Window)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastUncollapsedTick == Iris._cycleTick
                 end,
             },
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 local Window = thisWidget.Instance :: Frame
                 return Window.WindowButton
             end),
         },
-        Generate = function(thisWidget: Types.Window)
+        Generate = function(thisWidget)
             thisWidget.parentWidget = Iris._rootWidget -- only allow root as parent
 
             thisWidget.usesScreenGuis = Iris._config.UseScreenGUIs
@@ -854,7 +854,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             thisWidget.ChildContainer = ChildContainer
             return Window
         end,
-        GenerateState = function(thisWidget: Types.Window)
+        GenerateState = function(thisWidget)
             if thisWidget.state.size == nil then
                 thisWidget.state.size = Iris._widgetState(thisWidget, "size", Vector2.new(400, 300))
             end
@@ -874,7 +874,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.state.scrollDistance = Iris._widgetState(thisWidget, "scrollDistance", 0)
             end
         end,
-        Update = function(thisWidget: Types.Window)
+        Update = function(thisWidget)
             local Window = thisWidget.Instance :: GuiObject
             local ChildContainer = thisWidget.ChildContainer :: ScrollingFrame
             local WindowButton = Window.WindowButton :: TextButton
@@ -941,7 +941,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             Title.Text = thisWidget.arguments.Title or ""
         end,
-        UpdateState = function(thisWidget: Types.Window)
+        UpdateState = function(thisWidget)
             local stateSize = thisWidget.state.size.value
             local statePosition = thisWidget.state.position.value
             local stateIsUncollapsed = thisWidget.state.isUncollapsed.value
@@ -1042,7 +1042,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 end
             end
         end,
-        ChildAdded = function(thisWidget: Types.Window, thisChid: Types.Widget)
+        ChildAdded = function(thisWidget, thisChid)
             local Window = thisWidget.Instance :: Frame
             local WindowButton = Window.WindowButton :: TextButton
             local Content = WindowButton.Content :: Frame
@@ -1054,7 +1054,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             end
             return thisWidget.ChildContainer
         end,
-        Discard = function(thisWidget: Types.Window)
+        Discard = function(thisWidget)
             if focusedWindow == thisWidget then
                 focusedWindow = nil
                 anyFocusedWindow = false
@@ -1071,5 +1071,5 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             thisWidget.Instance:Destroy()
             widgets.discardState(thisWidget)
         end,
-    } :: Types.WidgetClass)
+    })
 end

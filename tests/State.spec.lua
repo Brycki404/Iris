@@ -1,8 +1,4 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 return function()
-    local Iris = require(ReplicatedStorage.Iris)
-
     local state
 
     beforeEach(function()

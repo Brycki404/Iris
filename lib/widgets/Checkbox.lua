@@ -1,6 +1,4 @@
-local Types = require(script.Parent.Parent.Types)
-
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+return function(Iris, widgets)
     --stylua: ignore
     Iris.WidgetConstructor("Checkbox", {
         hasState = true,
@@ -10,22 +8,22 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         },
         Events = {
             ["checked"] = {
-                ["Init"] = function(_thisWidget: Types.Checkbox) end,
-                ["Get"] = function(thisWidget: Types.Checkbox)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastCheckedTick == Iris._cycleTick
                 end,
             },
             ["unchecked"] = {
-                ["Init"] = function(_thisWidget: Types.Checkbox) end,
-                ["Get"] = function(thisWidget: Types.Checkbox)
+                ["Init"] = function(_thisWidget) end,
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastUncheckedTick == Iris._cycleTick
                 end,
             },
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(thisWidget: Types.Checkbox)
+        Generate = function(thisWidget)
             local Checkbox = Instance.new("TextButton")
             Checkbox.Name = "Iris_Checkbox"
             Checkbox.AutomaticSize = Enum.AutomaticSize.XY
@@ -86,16 +84,16 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Checkbox
         end,
-        GenerateState = function(thisWidget: Types.Checkbox)
+        GenerateState = function(thisWidget)
             if thisWidget.state.isChecked == nil then
                 thisWidget.state.isChecked = Iris._widgetState(thisWidget, "checked", false)
             end
         end,
-        Update = function(thisWidget: Types.Checkbox)
+        Update = function(thisWidget)
             local Checkbox = thisWidget.Instance :: TextButton
             Checkbox.TextLabel.Text = thisWidget.arguments.Text or "Checkbox"
         end,
-        UpdateState = function(thisWidget: Types.Checkbox)
+        UpdateState = function(thisWidget)
             local Checkbox = thisWidget.Instance :: TextButton
             local Box = Checkbox.Box :: Frame
             local Checkmark: ImageLabel = Box.Checkmark
@@ -107,9 +105,9 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 thisWidget.lastUncheckedTick = Iris._cycleTick + 1
             end
         end,
-        Discard = function(thisWidget: Types.Checkbox)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
             widgets.discardState(thisWidget)
         end,
-    } :: Types.WidgetClass)
+    })
 end

@@ -1,5 +1,4 @@
 --!optimize 2
-local Types = require(script.Types)
 
 --[=[
     @class Iris
@@ -20,9 +19,9 @@ local Types = require(script.Types)
     end)
     ```
 ]=]
-local Iris = {} :: Types.Iris
+local Iris = {}
 
-local Internal: Types.Internal = require(script.Internal)(Iris)
+local Internal = IrisModules.Internal(Iris)
 
 --[=[
     @within Iris
@@ -70,7 +69,7 @@ Iris.Events = {}
 
     If the `eventConnection` is `false` then Iris will not create a cycle loop and the user will need to call [Internal._cycle] every frame.
 ]=]
-function Iris.Init(parentInstance: BasePlayerGui | GuiBase2d?, eventConnection: (RBXScriptSignal | (() -> number) | false)?, allowMultipleInits: boolean): Types.Iris
+function Iris.Init(parentInstance: BasePlayerGui | GuiBase2d?, eventConnection: (RBXScriptSignal | (() -> number) | false)?, allowMultipleInits: boolean)
     assert(Internal._shutdown == false, "Iris.Init() cannot be called once shutdown.")
     assert(Internal._started == false or allowMultipleInits == true, "Iris.Init() can only be called once.")
 
@@ -183,7 +182,7 @@ function Iris.Append(userInstance: GuiObject)
     if Internal._config.Parent then
         widgetInstanceParent = Internal._config.Parent :: any
     else
-        widgetInstanceParent = Internal._widgets[parentWidget.type].ChildAdded(parentWidget, { type = "userInstance" } :: Types.Widget)
+        widgetInstanceParent = Internal._widgets[parentWidget.type].ChildAdded(parentWidget, { type = "userInstance" })
     end
     userInstance.Parent = widgetInstanceParent
 end
@@ -332,7 +331,7 @@ end
 
     TemplateConfig provides a table of default styles and configurations which you may apply to your UI.
 ]=]
-Iris.TemplateConfig = require(script.config)
+Iris.TemplateConfig = IrisModules.config
 Iris.UpdateGlobalConfig(Iris.TemplateConfig.colorDark) -- use colorDark and sizeDefault themes by default
 Iris.UpdateGlobalConfig(Iris.TemplateConfig.sizeDefault)
 Iris.UpdateGlobalConfig(Iris.TemplateConfig.utilityDefault)
@@ -351,7 +350,7 @@ Internal._globalRefreshRequested = false -- UpdatingGlobalConfig changes this to
 
     Pushes an id onto the id stack for all future widgets. Use [Iris.PopId] to pop it off the stack.
 ]=]
-function Iris.PushId(ID: Types.ID)
+function Iris.PushId(ID)
     assert(typeof(ID) == "string", "The ID argument to Iris.PushId() to be a string.")
 
     Internal._newID = true
@@ -394,7 +393,7 @@ end
     -- both text widgets will be placed under the same window despite being called separately.
     ```
 ]=]
-function Iris.SetNextWidgetID(ID: Types.ID)
+function Iris.SetNextWidgetID(ID)
     Internal._nextWidgetId = ID
 end
 
@@ -447,7 +446,7 @@ function Iris.State<T>(initialValue: T)
         lastChangeTick = Iris.Internal._cycleTick,
         ConnectedWidgets = {},
         ConnectedFunctions = {},
-    } :: Types.State<T>
+    }
     setmetatable(newState, Internal.StateClass)
     Internal._states[ID] = newState
     return newState
@@ -477,7 +476,7 @@ function Iris.WeakState<T>(initialValue: T)
         lastChangeTick = Iris.Internal._cycleTick,
         ConnectedWidgets = {},
         ConnectedFunctions = {},
-    } :: Types.State<T>
+    }
     setmetatable(newState, Internal.StateClass)
     Internal._states[ID] = newState
     return newState
@@ -538,7 +537,7 @@ function Iris.VariableState<T>(variable: T, callback: (T) -> ())
         lastChangeTick = Iris.Internal._cycleTick,
         ConnectedWidgets = {},
         ConnectedFunctions = {},
-    } :: Types.State<T>
+    }
     setmetatable(newState, Internal.StateClass)
     Internal._states[ID] = newState
 
@@ -620,7 +619,7 @@ function Iris.TableState<K, V>(tab: { [K]: V }, key: K, callback: ((newValue: V)
         lastChangeTick = Iris.Internal._cycleTick,
         ConnectedWidgets = {},
         ConnectedFunctions = {},
-    } :: Types.State<V>
+    }
     setmetatable(newState, Internal.StateClass)
     Internal._states[ID] = newState
 
@@ -654,7 +653,7 @@ end
     ```
     :::
 ]=]
-function Iris.ComputedState<T, U>(firstState: Types.State<T>, onChangeCallback: (firstValue: T) -> U)
+function Iris.ComputedState<T, U>(firstState, onChangeCallback: (firstValue: T) -> U)
     local ID = Internal._getID(2)
 
     if Internal._states[ID] then
@@ -666,7 +665,7 @@ function Iris.ComputedState<T, U>(firstState: Types.State<T>, onChangeCallback: 
             lastChangeTick = Iris.Internal._cycleTick,
             ConnectedWidgets = {},
             ConnectedFunctions = {},
-        } :: Types.State<T>
+        }
         setmetatable(newState, Internal.StateClass)
         Internal._states[ID] = newState
 
@@ -688,9 +687,9 @@ end
     Iris:Connect(Iris.ShowDemoWindow)
     ```
 ]=]
-Iris.ShowDemoWindow = require(script.demoWindow)(Iris)
+Iris.ShowDemoWindow = IrisModules.demoWindow(Iris)
 
-require(script.widgets)(Internal)
-require(script.API)(Iris)
+IrisModules.widgets(Internal)
+IrisModules.API(Iris)
 
 return Iris

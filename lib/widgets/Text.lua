@@ -1,6 +1,6 @@
-local Types = require(script.Parent.Parent.Types)
 
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+
+return function(Iris, widgets)
     --stylua: ignore
     Iris.WidgetConstructor("Text", {
         hasState = false,
@@ -12,11 +12,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["RichText"] = 4,
         },
         Events = {
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(_thisWidget: Types.Text)
+        Generate = function(_thisWidget)
             local Text = Instance.new("TextLabel")
             Text.Name = "Iris_Text"
             Text.AutomaticSize = Enum.AutomaticSize.XY
@@ -29,7 +29,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Text
         end,
-        Update = function(thisWidget: Types.Text)
+        Update = function(thisWidget)
             local Text = thisWidget.Instance :: TextLabel
             if thisWidget.arguments.Text == nil then
                 error("Text argument is required for Iris.Text().", 5)
@@ -52,10 +52,10 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             Text.Text = thisWidget.arguments.Text
         end,
-        Discard = function(thisWidget: Types.Text)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 
     --stylua: ignore
     Iris.WidgetConstructor("SeparatorText", {
@@ -65,11 +65,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["Text"] = 1,
         },
         Events = {
-            ["hovered"] = widgets.EVENTS.hover(function(thisWidget: Types.Widget)
+            ["hovered"] = widgets.EVENTS.hover(function(thisWidget)
                 return thisWidget.Instance
             end),
         },
-        Generate = function(_thisWidget: Types.SeparatorText)
+        Generate = function(_thisWidget)
             local SeparatorText = Instance.new("Frame")
             SeparatorText.Name = "Iris_SeparatorText"
             SeparatorText.AutomaticSize = Enum.AutomaticSize.Y
@@ -117,7 +117,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return SeparatorText
         end,
-        Update = function(thisWidget: Types.SeparatorText)
+        Update = function(thisWidget)
             local SeparatorText = thisWidget.Instance :: Frame
             local TextLabel: TextLabel = SeparatorText.TextLabel
             if thisWidget.arguments.Text == nil then
@@ -125,8 +125,8 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             end
             TextLabel.Text = thisWidget.arguments.Text
         end,
-        Discard = function(thisWidget: Types.SeparatorText)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 end

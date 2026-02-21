@@ -1,8 +1,6 @@
-local Types = require(script.Parent.Types)
+local widgets = {}
 
-local widgets = {} :: Types.WidgetUtility
-
-return function(Iris: Types.Internal)
+return function(Iris)
     widgets.GuiService = game:GetService("GuiService")
     widgets.RunService = game:GetService("RunService")
     widgets.UserInputService = game:GetService("UserInputService")
@@ -75,7 +73,7 @@ return function(Iris: Types.Internal)
         return Vector2.new(math.max(math.min(refPos.X + size.X, outerMax.X) - size.X, outerMin.X), math.max(math.min(refPos.Y + size.Y, outerMax.Y) - size.Y, outerMin.Y))
     end
 
-    function widgets.getScreenSizeForWindow(thisWidget: Types.Widget) -- possible parents are GuiBase2d, CoreGui, PlayerGui
+    function widgets.getScreenSizeForWindow(thisWidget) -- possible parents are GuiBase2d, CoreGui, PlayerGui
         if thisWidget.Instance:IsA("GuiBase2d") then
             return thisWidget.Instance.AbsoluteSize
         else
@@ -92,7 +90,7 @@ return function(Iris: Types.Internal)
         end
     end
 
-    function widgets.extend(superClass: Types.WidgetClass, subClass: Types.WidgetClass): Types.WidgetClass
+    function widgets.extend(superClass, subClass)
         local newClass = table.clone(superClass)
         for index, value in subClass do
             newClass[index] = value
@@ -314,7 +312,7 @@ return function(Iris: Types.Internal)
         end)
     end
 
-    function widgets.discardState(thisWidget: Types.StateWidget)
+    function widgets.discardState(thisWidget)
         for _, state in thisWidget.state do
             state.ConnectedWidgets[thisWidget.ID] = nil
         end
@@ -327,9 +325,9 @@ return function(Iris: Types.Internal)
     end
 
     widgets.EVENTS = {
-        hover = function(pathToHovered: (thisWidget: Types.Widget) -> GuiObject)
+        hover = function(pathToHovered: (thisWidget) -> GuiObject)
             return {
-                ["Init"] = function(thisWidget: Types.Widget & Types.Hovered)
+                ["Init"] = function(thisWidget)
                     local hoveredGuiObject = pathToHovered(thisWidget)
                     widgets.applyMouseEnter(hoveredGuiObject, function()
                         thisWidget.isHoveredEvent = true
@@ -339,15 +337,15 @@ return function(Iris: Types.Internal)
                     end)
                     thisWidget.isHoveredEvent = false
                 end,
-                ["Get"] = function(thisWidget: Types.Widget & Types.Hovered)
+                ["Get"] = function(thisWidget)
                     return thisWidget.isHoveredEvent
                 end,
             }
         end,
 
-        click = function(pathToClicked: (thisWidget: Types.Widget) -> GuiButton)
+        click = function(pathToClicked: (thisWidget) -> GuiButton)
             return {
-                ["Init"] = function(thisWidget: Types.Widget & Types.Clicked)
+                ["Init"] = function(thisWidget)
                     local clickedGuiObject = pathToClicked(thisWidget)
                     thisWidget.lastClickedTick = -1
 
@@ -355,15 +353,15 @@ return function(Iris: Types.Internal)
                         thisWidget.lastClickedTick = Iris._cycleTick + 1
                     end)
                 end,
-                ["Get"] = function(thisWidget: Types.Widget & Types.Clicked)
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastClickedTick == Iris._cycleTick
                 end,
             }
         end,
 
-        rightClick = function(pathToClicked: (thisWidget: Types.Widget) -> GuiButton)
+        rightClick = function(pathToClicked: (thisWidget) -> GuiButton)
             return {
-                ["Init"] = function(thisWidget: Types.Widget & Types.RightClicked)
+                ["Init"] = function(thisWidget)
                     local clickedGuiObject = pathToClicked(thisWidget)
                     thisWidget.lastRightClickedTick = -1
 
@@ -371,15 +369,15 @@ return function(Iris: Types.Internal)
                         thisWidget.lastRightClickedTick = Iris._cycleTick + 1
                     end)
                 end,
-                ["Get"] = function(thisWidget: Types.Widget & Types.RightClicked)
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastRightClickedTick == Iris._cycleTick
                 end,
             }
         end,
 
-        doubleClick = function(pathToClicked: (thisWidget: Types.Widget) -> GuiButton)
+        doubleClick = function(pathToClicked: (thisWidget) -> GuiButton)
             return {
-                ["Init"] = function(thisWidget: Types.Widget & Types.DoubleClicked)
+                ["Init"] = function(thisWidget)
                     local clickedGuiObject = pathToClicked(thisWidget)
                     thisWidget.lastClickedTime = -1
                     thisWidget.lastClickedPosition = Vector2.zero
@@ -396,15 +394,15 @@ return function(Iris: Types.Internal)
                         end
                     end)
                 end,
-                ["Get"] = function(thisWidget: Types.Widget & Types.DoubleClicked)
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastDoubleClickedTick == Iris._cycleTick
                 end,
             }
         end,
 
-        ctrlClick = function(pathToClicked: (thisWidget: Types.Widget) -> GuiButton)
+        ctrlClick = function(pathToClicked: (thisWidget) -> GuiButton)
             return {
-                ["Init"] = function(thisWidget: Types.Widget & Types.CtrlClicked)
+                ["Init"] = function(thisWidget)
                     local clickedGuiObject = pathToClicked(thisWidget)
                     thisWidget.lastCtrlClickedTick = -1
 
@@ -414,7 +412,7 @@ return function(Iris: Types.Internal)
                         end
                     end)
                 end,
-                ["Get"] = function(thisWidget: Types.Widget & Types.CtrlClicked)
+                ["Get"] = function(thisWidget)
                     return thisWidget.lastCtrlClickedTick == Iris._cycleTick
                 end,
             }
@@ -423,25 +421,25 @@ return function(Iris: Types.Internal)
 
     Iris._utility = widgets
 
-    require(script.Root)(Iris, widgets)
-    require(script.Window)(Iris, widgets)
+    IrisModules.Root(Iris, widgets)
+    IrisModules.Window(Iris, widgets)
 
-    require(script.Menu)(Iris, widgets)
+    IrisModules.Menu(Iris, widgets)
 
-    require(script.Format)(Iris, widgets)
+    IrisModules.Format(Iris, widgets)
 
-    require(script.Text)(Iris, widgets)
-    require(script.Button)(Iris, widgets)
-    require(script.Checkbox)(Iris, widgets)
-    require(script.RadioButton)(Iris, widgets)
-    require(script.Image)(Iris, widgets)
+    IrisModules.Text(Iris, widgets)
+    IrisModules.Button(Iris, widgets)
+    IrisModules.Checkbox(Iris, widgets)
+    IrisModules.RadioButton(Iris, widgets)
+    IrisModules.Image(Iris, widgets)
 
-    require(script.Tree)(Iris, widgets)
-    require(script.Tab)(Iris, widgets)
+    IrisModules.Tree(Iris, widgets)
+    IrisModules.Tab(Iris, widgets)
 
-    require(script.Input)(Iris, widgets)
-    require(script.Combo)(Iris, widgets)
-    require(script.Plot)(Iris, widgets)
+    IrisModules.Input(Iris, widgets)
+    IrisModules.Combo(Iris, widgets)
+    IrisModules.Plot(Iris, widgets)
 
-    require(script.Table)(Iris, widgets)
+    IrisModules.Table(Iris, widgets)
 end

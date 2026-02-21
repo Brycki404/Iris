@@ -1,13 +1,11 @@
-local Types = require(script.Parent.Parent.Types)
-
-return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
+return function(Iris, widgets)
     --stylua: ignore
     Iris.WidgetConstructor("Separator", {
         hasState = false,
         hasChildren = false,
         Args = {},
         Events = {},
-        Generate = function(thisWidget: Types.Separator)
+        Generate = function(thisWidget)
             local Separator = Instance.new("Frame")
             Separator.Name = "Iris_Separator"
             if thisWidget.parentWidget.type == "SameLine" then
@@ -24,11 +22,11 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Separator
         end,
-        Update = function(_thisWidget: Types.Separator) end,
-        Discard = function(thisWidget: Types.Separator)
+        Update = function(_thisWidget) end,
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 
     --stylua: ignore
     Iris.WidgetConstructor("Indent", {
@@ -38,7 +36,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["Width"] = 1,
         },
         Events = {},
-        Generate = function(_thisWidget: Types.Indent)
+        Generate = function(_thisWidget)
             local Indent = Instance.new("Frame")
             Indent.Name = "Iris_Indent"
             Indent.AutomaticSize = Enum.AutomaticSize.Y
@@ -51,18 +49,18 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Indent
         end,
-        Update = function(thisWidget: Types.Indent)
+        Update = function(thisWidget)
             local Indent = thisWidget.Instance :: Frame
 
             Indent.UIPadding.PaddingLeft = UDim.new(0, if thisWidget.arguments.Width then thisWidget.arguments.Width else Iris._config.IndentSpacing)
         end,
-        ChildAdded = function(thisWidget: Types.Indent, _thisChild: Types.Widget)
+        ChildAdded = function(thisWidget, _thisChild)
             return thisWidget.Instance
         end,
-        Discard = function(thisWidget: Types.Indent)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 
     --stylua: ignore
     Iris.WidgetConstructor("SameLine", {
@@ -74,7 +72,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
             ["HorizontalAlignment"] = 3,
         },
         Events = {},
-        Generate = function(_thisWidget: Types.SameLine)
+        Generate = function(_thisWidget)
             local SameLine = Instance.new("Frame")
             SameLine.Name = "Iris_SameLine"
             SameLine.AutomaticSize = Enum.AutomaticSize.Y
@@ -86,7 +84,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return SameLine
         end,
-        Update = function(thisWidget: Types.SameLine)
+        Update = function(thisWidget)
             local Sameline = thisWidget.Instance :: Frame
             local UIListLayout: UIListLayout = Sameline.UIListLayout
 
@@ -102,13 +100,13 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
                 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
             end
         end,
-        ChildAdded = function(thisWidget: Types.SameLine, _thisChild: Types.Widget)
+        ChildAdded = function(thisWidget, _thisChild)
             return thisWidget.Instance
         end,
-        Discard = function(thisWidget: Types.SameLine)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 
     --stylua: ignore
     Iris.WidgetConstructor("Group", {
@@ -116,7 +114,7 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
         hasChildren = true,
         Args = {},
         Events = {},
-        Generate = function(_thisWidget: Types.Group)
+        Generate = function(_thisWidget)
             local Group = Instance.new("Frame")
             Group.Name = "Iris_Group"
             Group.AutomaticSize = Enum.AutomaticSize.XY
@@ -129,12 +127,12 @@ return function(Iris: Types.Internal, widgets: Types.WidgetUtility)
 
             return Group
         end,
-        Update = function(_thisWidget: Types.Group) end,
-        ChildAdded = function(thisWidget: Types.Group, _thisChild: Types.Widget)
+        Update = function(_thisWidget) end,
+        ChildAdded = function(thisWidget, _thisChild)
             return thisWidget.Instance
         end,
-        Discard = function(thisWidget: Types.Group)
+        Discard = function(thisWidget)
             thisWidget.Instance:Destroy()
         end,
-    } :: Types.WidgetClass)
+    })
 end

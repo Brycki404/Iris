@@ -1,6 +1,4 @@
-local Types = require(script.Parent.Types)
-
-return function(Iris: Types.Iris)
+return function(Iris)
     local showMainWindow = Iris.State(true)
     local showRecursiveWindow = Iris.State(false)
     local showRuntimeInfo = Iris.State(false)
