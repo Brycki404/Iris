@@ -20,7 +20,8 @@ end)
 
 If you use a multiple script structure, you can just get the Iris library from the global variable it makes internally after loading it at least once in another script via the method above.
 ```lua
--- This is how you would use Iris within a different script from which Iris was loaded in (it's the exact same as the exaple above, that's the whole point)
+-- This is how you would use Iris within a different script from which Iris was loaded in
+-- (it's the exact same as the exaple above, that's the whole point)
 -- Basic Iris Usage Example:
 Iris:Connect(function()
     Iris.Window({"My First Window!"})
@@ -30,4 +31,5 @@ Iris:Connect(function()
     Iris.End()
 end)
 ```
+
 
