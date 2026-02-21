@@ -6,6 +6,7 @@ If you came to this page you already know what Iris is since this is a fork of t
 How to use in your own scripts:
 ```lua
 local Iris = loadstring(game:HttpGet("https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/loader.lua", true))()
+-- The following code would be inside the same script you are loading Iris in.
 -- Basic Iris Usage Example:
 Iris:Connect(function()
     Iris.Window({"My First Window!"})
@@ -18,6 +19,7 @@ end)
 
 If you use a multiple script structure, you can just get the Iris library from the global variable it makes internally after loading it at least once in another script via the method above.
 ```lua
+-- The following code would be inside a different script from the one you loaded Iris in.
 -- Basic Iris Usage Example:
 Iris:Connect(function()
     Iris.Window({"My First Window!"})
@@ -27,3 +29,4 @@ Iris:Connect(function()
     Iris.End()
 end)
 ```
+
