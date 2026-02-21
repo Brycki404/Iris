@@ -1,12 +1,12 @@
-local Types = require(script.Parent.Types)
+local Types = IrisModules.Types
 
-return function(Iris: Types.Iris): Types.Internal
+return function(Iris)
     --[=[
         @class Internal
         An internal class within Iris containing all the backend data and functions for Iris to operate.
         It is recommended that you don't generally interact with Internal unless you understand what you are doing.
     ]=]
-    local Internal = {} :: Types.Internal
+    local Internal = {}
 
     --[[
         ---------------------------------
@@ -148,7 +148,7 @@ return function(Iris: Types.Iris): Types.Internal
         end
         self.value = newValue
         self.lastChangeTick = Iris.Internal._cycleTick
-        for _, thisWidget: Types.Widget in self.ConnectedWidgets do
+        for _, thisWidget in self.ConnectedWidgets do
             if thisWidget.lastCycleTick ~= -1 then
                 Internal._widgets[thisWidget.type].UpdateState(thisWidget)
             end
@@ -333,7 +333,7 @@ return function(Iris: Types.Iris): Types.Internal
         of widgets, and simplifies the available functions which can be applied to any widget. The widgets themselves are
         dumb tables containing all the data but no methods to handle any of the data apart from events.
     ]=]
-    function Internal.WidgetConstructor(type: string, widgetClass: Types.WidgetClass)
+    function Internal.WidgetConstructor(type: string, widgetClass)
         local Fields = {
             All = {
                 Required = {
@@ -368,7 +368,7 @@ return function(Iris: Types.Iris): Types.Internal
 
         -- we ensure all essential functions and properties are present, otherwise the code will break later.
         -- some functions will only be needed if the widget has children or has state.
-        local thisWidget = {} :: Types.WidgetClass
+        local thisWidget = {}
         for _, field in Fields.All.Required do
             assert(widgetClass[field] ~= nil, `field {field} is missing from widget {type}, it is required for all widgets`)
             thisWidget[field] = widgetClass[field]
@@ -442,7 +442,7 @@ return function(Iris: Types.Iris): Types.Internal
         Every widget is created through _Insert. An ID is generated based on the line of the calling code and is used to
         find the previous frame widget if it exists. If no widget exists, a new one is created.
     ]=]
-    function Internal._Insert(widgetType: string, args: Types.WidgetArguments?, states: Types.WidgetStates?)
+    function Internal._Insert(widgetType: string, args, states)
         local ID = Internal._getID(3)
         --debug.profilebegin(ID)
 
@@ -454,7 +454,7 @@ return function(Iris: Types.Iris): Types.Internal
             return Internal._ContinueWidget(ID, widgetType)
         end
 
-        local arguments = {} :: Types.Arguments
+        local arguments = {}
         if args ~= nil then
             if type(args) ~= "table" then
                 args = { args }
@@ -498,7 +498,7 @@ return function(Iris: Types.Iris): Types.Internal
 
         -- since rows are not instances, but will be removed if not updated, we have to add specific table code.
         if parentWidget.type == "Table" then
-            local Table = parentWidget :: Types.Table
+            local Table = parentWidget
             Table._rowCycles[Table._rowIndex] = Internal._cycleTick
         end
 
@@ -515,7 +515,7 @@ return function(Iris: Types.Iris): Types.Internal
         parentWidget.ZOffset += 1
 
         if thisWidgetClass.hasChildren then
-            local thisParent = thisWidget :: Types.ParentWidget
+            local thisParent = thisWidget
             -- a parent widget, so we increase our depth.
             thisParent.ZOffset = 0
             thisParent.ZUpdate = false
@@ -543,13 +543,13 @@ return function(Iris: Types.Iris): Types.Internal
         All widgets are created as tables with properties. The widget class contains the functions to create the UI instances and
         update the widget or change state.
     ]=]
-    function Internal._GenNewWidget(widgetType: string, arguments: Types.Arguments, states: Types.WidgetStates?, ID: Types.ID)
+    function Internal._GenNewWidget(widgetType: string, arguments, states, ID)
         local parentId = Internal._IDStack[Internal._stackIndex]
-        local parentWidget: Types.ParentWidget = Internal._VDOM[parentId]
+        local parentWidget = Internal._VDOM[parentId]
         local thisWidgetClass = Internal._widgets[widgetType]
 
         -- widgets are just tables with properties.
-        local thisWidget = {} :: Types.Widget
+        local thisWidget = {}
         setmetatable(thisWidget, thisWidget)
 
         thisWidget.ID = ID
@@ -578,7 +578,7 @@ return function(Iris: Types.Iris): Types.Internal
 
         local eventMTParent
         if thisWidgetClass.hasState then
-            local stateWidget = thisWidget :: Types.StateWidget
+            local stateWidget = thisWidget
             if states then
                 for index, state in states do
                     if not (type(state) == "table" and getmetatable(state :: any) == Internal.StateClass) then
@@ -628,7 +628,7 @@ return function(Iris: Types.Iris): Types.Internal
         arguments or states.
         Basically equivalent to the end of `Internal._Insert`.
     ]=]
-    function Internal._ContinueWidget(ID: Types.ID, widgetType: string)
+    function Internal._ContinueWidget(ID, widgetType: string)
         local thisWidgetClass = Internal._widgets[widgetType]
         local thisWidget = Internal._VDOM[ID]
 
@@ -651,7 +651,7 @@ return function(Iris: Types.Iris): Types.Internal
         previous frame. There is no code which needs to update any widget tables since they are already reset
         at the start before discarding happens.
     ]=]
-    function Internal._DiscardWidget(widgetToDiscard: Types.Widget)
+    function Internal._DiscardWidget(widgetToDiscard)
         local widgetParent = widgetToDiscard.parentWidget
         if widgetParent then
             -- if the parent needs to update it's children.
@@ -676,7 +676,7 @@ return function(Iris: Types.Iris): Types.Internal
         Connects the state to the widget. If no state exists then a new one is created. Called for every state in every
         widget if the user does not provide a state.
     ]=]
-    function Internal._widgetState<T>(thisWidget: Types.StateWidget, stateName: string, initialValue: T)
+    function Internal._widgetState<T>(thisWidget, stateName: string, initialValue: T)
         local ID = thisWidget.ID .. stateName
         if Internal._states[ID] then
             Internal._states[ID].ConnectedWidgets[thisWidget.ID] = thisWidget
@@ -689,7 +689,7 @@ return function(Iris: Types.Iris): Types.Internal
                 lastChangeTick = Internal._cycleTick,
                 ConnectedWidgets = { [thisWidget.ID] = thisWidget },
                 ConnectedFunctions = {},
-            } :: Types.State<T>
+            }
             setmetatable(newState, Internal.StateClass)
             Internal._states[ID] = newState
             return newState
@@ -706,7 +706,7 @@ return function(Iris: Types.Iris): Types.Internal
         A wrapper for any event on any widget. Automatically, Iris does not initialize events unless they are explicitly
         called so in the first frame, the event connections are set up. Every event is a function which returns a boolean.
     ]=]
-    function Internal._EventCall(thisWidget: Types.Widget, eventName: string)
+    function Internal._EventCall(thisWidget, eventName: string)
         local Events = Internal._widgets[thisWidget.type].Events
         local Event = Events[eventName]
         assert(Event ~= nil, `widget {thisWidget.type} has no event of name {eventName}`)
@@ -725,7 +725,7 @@ return function(Iris: Types.Iris): Types.Internal
 
         Returns the parent widget of the currently active widget, based on the stack depth.
     ]=]
-    function Internal._GetParentWidget(): Types.ParentWidget
+    function Internal._GetParentWidget()
         return Internal._VDOM[Internal._IDStack[Internal._stackIndex]]
     end
 
