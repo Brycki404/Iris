@@ -8,7 +8,7 @@ assert(OldGet, "No HttpGet function found on game object.")
 loadstring(OldGet(game, "https://raw.githubusercontent.com/Brycki404/BetterLib/refs/heads/main/main.lua", true))()
 -- Begin Script:
 
-local IrisUrl = "https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/lib/init.lua"
-local Iris = loadstring(Get(LibInitUrl))()
+local IrisInitUrl = "https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/lib/init.lua"
+local Iris = loadstring(Get(IrisInitUrl))()
 _G.Iris = Iris
 return Iris
