@@ -6,7 +6,11 @@ if not _G.BetterLib or not _G.Get then
 end
 -- Begin Script:
 
-local IrisInitUrl = "https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/lib/init.lua"
-local Iris = loadstring(Get(IrisInitUrl))()
+local URLs = {
+    Init = "https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/lib/init.lua";
+    
+}
+
+local Iris = loadstring(Get(URLs.Init))()
 _G.Iris = Iris
 return Iris
