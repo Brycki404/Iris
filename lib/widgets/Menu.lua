@@ -1,5 +1,3 @@
-
-
 return function(Iris, widgets)
     local AnyMenuOpen = false
     local ActiveMenu = nil
@@ -244,7 +242,7 @@ return function(Iris, widgets)
 
             widgets.applyMouseEnter(Menu, function()
                 if AnyMenuOpen and ActiveMenu and ActiveMenu ~= thisWidget then
-                    local parentMenu = thisWidget.parentWidget :
+                    local parentMenu = thisWidget.parentWidget
                     local parentIndex = table.find(MenuStack, parentMenu)
 
                     EmptyMenuStack(parentIndex)
@@ -334,7 +332,7 @@ return function(Iris, widgets)
         Discard = function(thisWidget)
             -- properly handle removing a menu if open and deleted
             if AnyMenuOpen then
-                local parentMenu = thisWidget.parentWidget :
+                local parentMenu = thisWidget.parentWidget
                 local parentIndex = table.find(MenuStack, parentMenu)
                 if parentIndex then
                     EmptyMenuStack(parentIndex)
@@ -396,7 +394,7 @@ return function(Iris, widgets)
             end)
 
             widgets.applyMouseEnter(MenuItem, function()
-                local parentMenu = thisWidget.parentWidget :
+                local parentMenu = thisWidget.parentWidget
                 if AnyMenuOpen and ActiveMenu and ActiveMenu ~= parentMenu then
                     local parentIndex = table.find(MenuStack, parentMenu)
 
@@ -507,7 +505,7 @@ return function(Iris, widgets)
             end)
 
             widgets.applyMouseEnter(MenuToggle, function()
-                local parentMenu = thisWidget.parentWidget :
+                local parentMenu = thisWidget.parentWidget
                 if AnyMenuOpen and ActiveMenu and ActiveMenu ~= parentMenu then
                     local parentIndex = table.find(MenuStack, parentMenu)
 
