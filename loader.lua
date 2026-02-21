@@ -79,7 +79,7 @@ _G.IrisModules = IrisModules
 
 for moduleName, url in pairs(IrisURLs) do
     if not table.find(MustBeLoadedManually, moduleName) then
-        IrisModules[moduleName] = loadstring(Get(url))
+        IrisModules[moduleName] = loadstring(Get(url))()
     end
 end
 
