@@ -11,3 +11,4 @@ loadstring(OldGet(game, "https://raw.githubusercontent.com/Brycki404/BetterLib/r
 local IrisUrl = "https://raw.githubusercontent.com/Brycki404/Iris/refs/heads/main/lib/init.lua"
 local Iris = loadstring(Get(LibInitUrl))()
 _G.Iris = Iris
+return Iris
