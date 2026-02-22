@@ -1,11 +1,13 @@
 -- Iris loader script. This script is responsible for loading all of the required modules for Iris and initializing it. It also caches the loaded modules and the initialized Iris in the global table, so that they can be accessed by other scripts if needed.
 
+local genv = getgenv()
+
 -- If Iris is already loaded, return it instead of loading it again.
-if _G.Iris then
-    return _G.Iris
+if genv.Iris then
+    return genv.Iris
 end
 
-if not _G.BetterLib then
+if not genv.BetterLib then
     local OldGet = game.HttpGet or game.HttpGetAsync or nil
     assert(OldGet, "No HttpGet function found.")
     -- Load BetterLib first (if it's not already loaded), since every other loaded stuff will depend on it. If BetterLib fails to load, everything else won't work, but at least the error will be more informative.
@@ -65,17 +67,17 @@ IrisURLs = {
 -- table that represents the heirarchy and then using that table as the environment
 -- for the modules, but that would be more trouble than it's worth and would still be pretty hacky.
 -- So instead, we'll just load all of the modules using Get and
--- cache them in _G.IrisModules, and then instead of using require
+-- cache them in genv.IrisModules, and then instead of using require
 -- calls, we will just look up the modules in that table.
 
 IrisModules = {}
-_G.IrisModules = IrisModules
+genv.IrisModules = IrisModules
 
 IrisModules.Signal = loadstring(Get(IrisURLs.Signal))()
-_G.IrisModules = IrisModules
+genv.IrisModules = IrisModules
 
 IrisModules.UserInputService = loadstring(Get(IrisURLs.UserInputService))()
-_G.IrisModules = IrisModules
+genv.IrisModules = IrisModules
 
 for moduleName, url in pairs(IrisURLs) do
     if not table.find(MustBeLoadedManually, moduleName) then
@@ -83,11 +85,11 @@ for moduleName, url in pairs(IrisURLs) do
     end
 end
 
-_G.IrisModules = IrisModules
+genv.IrisModules = IrisModules
 
--- Finally initialize Iris and cache it in _G.Iris,
+-- Finally initialize Iris and cache it in genv.Iris,
 -- so that it can be accessed by other scripts if needed.
 
 Iris = loadstring(Get(IrisURLs.init))().Init()
-_G.Iris = Iris
+genv.Iris = Iris
 return Iris
